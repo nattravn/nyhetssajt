@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using CodeHollow.FeedReader;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nyhetssajt.Models;
-using SimpleFeedReader;
+
 
 namespace Nyhetssajt.Controllers
 {
@@ -25,6 +27,7 @@ namespace Nyhetssajt.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Expressen>>> GetExpressens()
         {
+            Debug.WriteLine("get feeds");
             return await _context.Expressens.ToListAsync();
         }
 
@@ -76,16 +79,26 @@ namespace Nyhetssajt.Controllers
         [HttpPost]
         public async Task<ActionResult<Expressen>> PostExpressen(Expressen expressen)
         {
-            var reader = new FeedReader();
-            var items = reader.RetrieveFeed("http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss");
+            Debug.WriteLine("Post feed");
+            //var reader = new FeedReader();
+            //var items = reader.RetrieveFeed("http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss");
 
-            foreach (var i in items)
+            var feed = FeedReader.Read("http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss");
+
+            Debug.WriteLine("items: " + feed.Description);
+
+            foreach (var item in feed.Items)
             {
-                Console.WriteLine(string.Format("{0}\t{1}",
-                        i.Date.ToString("g"),
-                        i.Title
-                ));
+                Debug.WriteLine("item: " + item.Title + " - " + item.Link);
             }
+            //foreach (var i in items)
+            //{
+            //    Debug.WriteLine("items: "+ i.Content);
+            //    Debug.WriteLine(string.Format("{0}\t{1}",
+            //            i.Date.ToString("g"),
+            //            i.Title
+            //    ));
+            //}
 
             _context.Expressens.Add(expressen);
             await _context.SaveChangesAsync();
