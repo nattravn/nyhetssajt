@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Serialization;
 using Nyhetssajt.Models;
 
 namespace Nyhetssajt
@@ -33,6 +34,16 @@ namespace Nyhetssajt
 
             services.AddDbContext<ExpressenContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
+
+            services.AddCors();
+            //disable .net cores auto camelcaseing for the response keys. We want the front-end model to be equal to the backend-model
+            services.AddMvc()
+            .AddJsonOptions(options =>
+             {
+                 var resolver = options.SerializerSettings.ContractResolver;
+                 if (resolver != null)
+                     (resolver as DefaultContractResolver).NamingStrategy = null;
+             });
 
         }
 
