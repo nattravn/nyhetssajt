@@ -1,5 +1,5 @@
 export class Expressen {
-    ID: string;
+    ID: number;
     Title: string;
     ImageURL: string;
     Text: string;

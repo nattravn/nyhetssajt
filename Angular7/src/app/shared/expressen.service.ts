@@ -29,11 +29,7 @@ export class ExpressenService {
 
   constructor(private http: HttpClient, private feed: Expressen) { 
     
-    console.log("list: ", this.list);
-
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
-      console.log("res: ", res.items);
-      //this.list = res.items ;
 
       res.items.forEach((item, index )=> {
         console.log("index: ", index);
@@ -58,15 +54,12 @@ export class ExpressenService {
         })
       });
       
-      
       this.getExpressen().then(res =>{
-        this.list = res as Expressen[];
+        let array = res as Expressen[];
+        array.sort((a,b) => b.Date.localeCompare(a.Date));
+        this.list = array;
       });
-      
     })
-
-    
-
   }
 
   postExpressen(feed : Expressen){
