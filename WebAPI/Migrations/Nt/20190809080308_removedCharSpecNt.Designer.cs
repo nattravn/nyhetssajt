@@ -2,15 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nyhetssajt.Models;
 
-namespace Nyhetssajt.Migrations
+namespace Nyhetssajt.Migrations.Nt
 {
-    [DbContext(typeof(ExpressenContext))]
-    partial class ExpressenContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(NtContext))]
+    [Migration("20190809080308_removedCharSpecNt")]
+    partial class removedCharSpecNt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -18,7 +20,7 @@ namespace Nyhetssajt.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Nyhetssajt.Models.Expressen", b =>
+            modelBuilder.Entity("Nyhetssajt.Models.Nt", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -45,7 +47,7 @@ namespace Nyhetssajt.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Expressens");
+                    b.ToTable("Nts");
                 });
 #pragma warning restore 612, 618
         }

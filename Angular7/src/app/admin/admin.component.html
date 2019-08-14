@@ -1,0 +1,23 @@
+<form  [formGroup]="customService.form" class="normal-form" (submit)="onSubmit()">
+  <mat-grid-list cols="1" rowHeight="800px">
+    <mat-grid-tile>
+      <div class="controls-container">
+        <mat-form-field>
+          <input formControlName="Source" matInput placeholder="Source">
+          <mat-error>This field is mandatory.</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input formControlName="Info" matInput placeholder="Info">
+          <mat-error>Invalid email address.</mat-error>
+        </mat-form-field>
+        <mat-form-field>
+          <input formControlName="Rss" matInput placeholder="Rss">
+        </mat-form-field>
+        <div class="button-row">
+          <button mat-raised-button color="primary" type="submit" >Submit</button>
+          <button mat-raised-button color="warn" type='button' (click)="onClear()">Clear</button>
+        </div>
+      </div>
+    </mat-grid-tile>
+  </mat-grid-list>
+</form>

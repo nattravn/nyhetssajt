@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nyhetssajt.Models;
 
-namespace Nyhetssajt.Migrations
+namespace Nyhetssajt.Migrations.Svd
 {
-    [DbContext(typeof(ExpressenContext))]
-    partial class ExpressenContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SvdContext))]
+    partial class SvdContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -18,7 +18,7 @@ namespace Nyhetssajt.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Nyhetssajt.Models.Expressen", b =>
+            modelBuilder.Entity("Nyhetssajt.Models.Svd", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -41,11 +41,12 @@ namespace Nyhetssajt.Migrations
 
                     b.Property<string>("Text");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(MAX)");
 
                     b.HasKey("ID");
 
-                    b.ToTable("Expressens");
+                    b.ToTable("Svds");
                 });
 #pragma warning restore 612, 618
         }

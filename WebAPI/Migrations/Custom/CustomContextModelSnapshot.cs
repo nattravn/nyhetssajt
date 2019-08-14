@@ -5,10 +5,10 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nyhetssajt.Models;
 
-namespace Nyhetssajt.Migrations
+namespace Nyhetssajt.Migrations.Custom
 {
-    [DbContext(typeof(ExpressenContext))]
-    partial class ExpressenContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(CustomContext))]
+    partial class CustomContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -18,7 +18,7 @@ namespace Nyhetssajt.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("Nyhetssajt.Models.Expressen", b =>
+            modelBuilder.Entity("Nyhetssajt.Models.Custom", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
@@ -33,7 +33,12 @@ namespace Nyhetssajt.Migrations
                     b.Property<string>("ImageURL")
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<string>("Info");
+
                     b.Property<string>("Link")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("Rss")
                         .HasColumnType("nvarchar(250)");
 
                     b.Property<string>("Source")
@@ -41,11 +46,12 @@ namespace Nyhetssajt.Migrations
 
                     b.Property<string>("Text");
 
-                    b.Property<string>("Title");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(MAX)");
 
                     b.HasKey("ID");
 
-                    b.ToTable("Expressens");
+                    b.ToTable("Customs");
                 });
 #pragma warning restore 612, 618
         }
