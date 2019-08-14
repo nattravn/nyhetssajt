@@ -11,7 +11,7 @@ namespace Nyhetssajt.Models
     {
         [Key]
         public int ID { get; set; }
-        [Column(TypeName = "nvarchar(100)")]
+
         public string Title { get; set; }
         [Column(TypeName = "nvarchar(250)")]
         public string ImageURL { get; set; }
