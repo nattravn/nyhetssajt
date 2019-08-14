@@ -6,6 +6,9 @@
             <div [innerHTML]="feed.Text"></div>
         </article>
         <em>{{feed.Date}}</em>
-        <a class="btn btn-blog pull-right marginBottom10" [href]="feed.Link">READ MORE</a> 
+        <br>
+        <a (click)="categoryService.populate(feed.Category)"  routerLink="/category">{{feed.Category}}</a>
+        <br>
+        <a [href]="feed.Link">Läs mer</a> 
     </div>
   </div>
