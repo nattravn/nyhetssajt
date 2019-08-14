@@ -14,6 +14,14 @@ import { Svd } from './shared/svd.model';
 import { NtComponent } from './nt/nt.component';
 import { NtService } from './shared/nt.service';
 import { Nt } from './shared/nt.model';
+import { CategoryComponent } from './category/category.component';
+import { CustomComponent } from './custom/custom.component';
+import { CustomService } from './shared/custom.service';
+import { Custom } from './shared/custom.model';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MaterialModule } from "./material/material.module";
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { AdminComponent } from './admin/admin.component';
 
 
 @NgModule({
@@ -22,12 +30,19 @@ import { Nt } from './shared/nt.model';
     ExpressenComponent,
     HomeComponent,
     SvdComponent,
-    NtComponent
+    NtComponent,
+    CategoryComponent,
+    CustomComponent,
+    AdminComponent
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
+    MaterialModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
   providers: [
     ExpressenService,
@@ -35,8 +50,11 @@ import { Nt } from './shared/nt.model';
     SvdService,
     Svd,
     NtService,
-    Nt
+    Nt,
+    CustomService,
+    Custom
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [CustomComponent]
 })
 export class AppModule { }
