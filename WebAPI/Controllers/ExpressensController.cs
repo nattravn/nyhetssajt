@@ -49,6 +49,7 @@ namespace Nyhetssajt.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutExpressen(int id, Expressen expressen)
         {
+            Debug.WriteLine("Update feed");
             if (id != expressen.ID)
             {
                 return BadRequest();
@@ -79,29 +80,18 @@ namespace Nyhetssajt.Controllers
         [HttpPost]
         public async Task<ActionResult<Expressen>> PostExpressen(Expressen expressen)
         {
-            Debug.WriteLine("Post feed");
-            //var reader = new FeedReader();
-            //var items = reader.RetrieveFeed("http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss");
-
-            var feed = FeedReader.Read("http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss");
-
-            Debug.WriteLine("items: " + feed.Description);
-
-            foreach (var item in feed.Items)
+            if (_context.Expressens.Count() >= 10)
             {
-                Debug.WriteLine("item: " + item.Title + " - " + item.Link);
+                _context.Database.ExecuteSqlCommand("DELETE FROM Expressens DBCC CHECKIDENT('Expressens', RESEED, 0)");
             }
-            //foreach (var i in items)
-            //{
-            //    Debug.WriteLine("items: "+ i.Content);
-            //    Debug.WriteLine(string.Format("{0}\t{1}",
-            //            i.Date.ToString("g"),
-            //            i.Title
-            //    ));
-            //}
 
             _context.Expressens.Add(expressen);
             await _context.SaveChangesAsync();
+
+            Debug.WriteLine("2. expressen.id: " + expressen.ID);
+
+
+
 
             return CreatedAtAction("GetExpressen", new { id = expressen.ID }, expressen);
         }
