@@ -5,7 +5,7 @@ import { Expressen } from './expressen.model';
 import { Observable, bindNodeCallback } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 // import { parseString, parseFile, parseURL, RSSParsed } from 'rss-parser';
-import Axios, {AxiosInstance} from 'axios';
+
 
 //https://github.com/ardatan/angular-rss-reader/blob/master/src/app/rss-feed.component.ts
 
@@ -32,20 +32,19 @@ export class ExpressenService {
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
 
       res.items.forEach((item, index )=> {
-        console.log("index: ", index);
-        this.feed.Category =  "";//item.Category.length > 0 ? item.Category[0] : null ;
+        this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.Date = item.pubDate;
         this.feed.Text =  item.content;
         this.feed.Link = item.link;
         this.feed.ImageURL = item.thumbnail;
-        this.feed.ID = index+1;
+        this.feed.ID = 0;
         this.feed.Title = item.title;
         this.feed.Source = "Expressen";
         
         // only adds the last item???
         //this.list.push(this.feed);
 
-        this.putExpressen(this.feed).subscribe(res => {
+        this.postExpressen(this.feed).subscribe(res => {
           console.log("feed inserted");
         },
         err =>{
@@ -63,12 +62,10 @@ export class ExpressenService {
   }
 
   postExpressen(feed : Expressen){
-    console.log("post feed: ", feed);
     return this.http.post(this.rootURL+"/Expressens",feed);
   }
 
   getExpressen(){
-    console.log("get feed");
     return this.http.get(this.rootURL+"/Expressens").toPromise();
   }
 
