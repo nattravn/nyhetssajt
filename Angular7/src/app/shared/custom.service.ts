@@ -13,6 +13,7 @@ import { Custom } from './custom.model';
 export class CustomService {
 
   list: Custom[];
+  activeList: Custom[] = [];
   customRoutes :string[] = [];
   readonly rootURL = "http://localhost:44380/api";
   constructor(private http: HttpClient, private feed: Custom) { 
@@ -29,6 +30,7 @@ export class CustomService {
     //https://www.svt.se/nyheter/rss.xml
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+news.Rss).toPromise().then(res  =>{
 
+    console.log("news: ", res);
       res.items.forEach((item, index )=> {
         this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.Date = item.pubDate;
@@ -54,6 +56,7 @@ export class CustomService {
       });
 
       //this.list = new Array<Custom>();
+      this.customRoutes.push(news.Source);
 
       this.getCustom().then(res =>{
         let array = res as Custom[];
@@ -71,7 +74,17 @@ export class CustomService {
     return this.http.get(this.rootURL+"/Customs").toPromise();
   }
 
+  updateCustom(feed : Custom){
+    return this.http.put(this.rootURL+"/Customs/" + feed.ID, feed).toPromise();
+  }
+
   updateList(route: string){
-    
+    this.activeList = [];
+    this.list.forEach(item => {
+      if(item.Source == route){
+        console.log(item.Source + " == " + route);
+        this.activeList.push(item);
+      }
+    })
   }
 }
