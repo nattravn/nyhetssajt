@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -76,26 +77,9 @@ namespace Nyhetssajt.Controllers
         public async Task<ActionResult<Custom>> PostCustom(Custom custom)
         {
 
-            DbSet<Custom> x = _context.Customs;
 
-            var customList = new List<Custom>();
-            customList = x.ToList<Custom>();
-
-            customList.ForEach(item =>
-            {
-                if (item.Source == custom.Source)
-                {
-                    //old source -> update
-                    _context.Customs.Remove(custom);
-                    _context.Customs.Add(custom);
-                }
-                else
-                {
-                    //new source -> just add
-                    _context.Customs.Add(custom);
-                }
-                
-            });
+            _context.Customs.Add(custom);
+           
             //if (_context.Customs.Count() >= 100)
             //{
             //    _context.Database.ExecuteSqlCommand("DELETE FROM Customs DBCC CHECKIDENT('Customs', RESEED, 0)");
