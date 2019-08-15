@@ -20,16 +20,19 @@ export class AppComponent {
           //this.router.config.push({ path: array[0].Source, component: CustomComponent });
           this.customService.customRoutes.push(array[0].Source);
           console.log("Push: ", array[0].ID);
-          this.customService.insertCustom(array[0]);
         }
         
         if(index < array.length-1 && array[index].Source != array[index+1].Source  ){
           console.log("Push: ", array[index].Source);
-          this.customService.insertCustom(array[index]);
+          this.customService.updateCustom(array[index]);
+          this.customService.customRoutes.push(array[index+1].Source);
           //this.router.config.push({ path: array[index].Source, component: CustomComponent });
-          this.customService.customRoutes.push(array[index].Source);
+          
         }
       })
+
+      array.sort((a,b) => b.Date.localeCompare(a.Date));
+      this.customService.list = array;
     })
 
     console.log("this.router: ", this.router.config);
