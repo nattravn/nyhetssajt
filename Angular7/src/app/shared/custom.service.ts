@@ -15,6 +15,9 @@ export class CustomService {
   list: Custom[];
   activeList: Custom[] = [];
   customRoutes :string[] = [];
+
+  sourceList: Array<Custom> = new Array<Custom>();
+  
   readonly rootURL = "http://localhost:44380/api";
   constructor(private http: HttpClient, private feed: Custom) { 
     
@@ -26,11 +29,14 @@ export class CustomService {
     Rss: new FormControl("")
   })
 
+  sourceInfo: Array<string> = [];
+  sourceName: Array<string> = [];
+  currentSourceInfo:string = ""; 
+  currentSourceName:string = ""; 
   insertCustom(news){
     //https://www.svt.se/nyheter/rss.xml
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+news.Rss).toPromise().then(res  =>{
 
-    console.log("news: ", res);
       res.items.forEach((item, index )=> {
         this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.Date = item.pubDate;
@@ -78,11 +84,19 @@ export class CustomService {
     return this.http.put(this.rootURL+"/Customs/" + feed.ID, feed).toPromise();
   }
 
+  deleteCustom(id : number){
+
+    return this.http.delete(this.rootURL+"/Customs/" + id);
+
+  }
+
   updateList(route: string){
     this.activeList = [];
-    this.list.forEach(item => {
+    this.list.forEach((item, index)=> {
       if(item.Source == route){
         console.log(item.Source + " == " + route);
+        this.currentSourceInfo = this.sourceInfo[index];
+        this.currentSourceName = this.sourceName[index];
         this.activeList.push(item);
       }
     })

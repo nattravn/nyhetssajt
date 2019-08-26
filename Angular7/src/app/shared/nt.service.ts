@@ -19,12 +19,16 @@ export class NtService {
     Source: ""
   }]
 
+  sourceInfo:string = "";
+  sourceName:string = "";
+
   private rssUrl: string = "http://www.nt.se/nyheter/norrkoping/rss/";
 
   constructor(private http: HttpClient, private feed: Nt) { 
     
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
-
+      this.sourceInfo = res.feed.description;
+      this.sourceName = res.feed.title;
       res.items.forEach((item, index )=> {
         this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.Date = item.pubDate;
@@ -33,7 +37,7 @@ export class NtService {
         this.feed.ImageURL = item.thumbnail;
         this.feed.ID = 0;
         this.feed.Title = item.title;
-        this.feed.Source = "Expressen";
+        this.feed.Source = "Nt";
         
         // only adds the last item???
         //this.list.push(this.feed);

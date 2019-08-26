@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nyhetssajt.Models;
+using System.Data.SqlClient;
 
 namespace Nyhetssajt.Controllers
 {
@@ -15,6 +16,7 @@ namespace Nyhetssajt.Controllers
     public class CustomsController : ControllerBase
     {
         private readonly CustomContext _context;
+        private int chunk = 0;
 
         public CustomsController(CustomContext context)
         {
@@ -46,11 +48,13 @@ namespace Nyhetssajt.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustom(int id, Custom custom)
         {
+            Debug.WriteLine("updated new id: " + id + " from old: " + custom.ID);
             if (id != custom.ID)
             {
                 return BadRequest();
             }
 
+            Debug.WriteLine("updated new id: "+ id + " from old: " + custom.ID);
             _context.Entry(custom).State = EntityState.Modified;
 
             try
@@ -76,15 +80,7 @@ namespace Nyhetssajt.Controllers
         [HttpPost]
         public async Task<ActionResult<Custom>> PostCustom(Custom custom)
         {
-
-
             _context.Customs.Add(custom);
-           
-            //if (_context.Customs.Count() >= 100)
-            //{
-            //    _context.Database.ExecuteSqlCommand("DELETE FROM Customs DBCC CHECKIDENT('Customs', RESEED, 0)");
-            //}
-
             
             await _context.SaveChangesAsync();
 
@@ -95,16 +91,92 @@ namespace Nyhetssajt.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Custom>> DeleteCustom(int id)
         {
-            var custom = await _context.Customs.FindAsync(id);
-            if (custom == null)
-            {
-                return NotFound();
-            }
+            Debug.WriteLine("Delete id outside: " + id);
 
+            var custom = await _context.Customs.FindAsync(id);
             _context.Customs.Remove(custom);
             await _context.SaveChangesAsync();
 
-            return custom;
+            for (int i = 1; i < 10; i++)
+            {
+
+                
+                custom = await _context.Customs.FindAsync(id + i);
+                if (custom == null)
+                {
+                    return NotFound();
+                }
+
+                _context.Customs.Remove(custom);
+                await _context.SaveChangesAsync();
+                Debug.WriteLine("Delete id: " + (id + i));
+
+
+            }
+            
+
+            var y = _context.Customs;
+            List<Custom> l = y.ToList();
+
+            int n = _context.Customs.Count();
+            Debug.WriteLine("n before: " + n);
+
+            var itemsToDelete = _context.Set<Custom>();
+            _context.Customs.RemoveRange(itemsToDelete);
+            _context.SaveChanges();
+            //await _context.Customs.ForEachAsync(e =>
+            //{
+            //     _context.Customs.Remove(e);
+
+            //});
+
+            //await _context.SaveChangesAsync();
+
+            _context.Database.ExecuteSqlCommand("DELETE FROM Customs DBCC CHECKIDENT('Customs', RESEED,  0 )");
+           // _context.Database.ExecuteSqlCommand("DELETE FROM Customs");
+            n = _context.Customs.Count();
+            Debug.WriteLine("n after: " + n);
+            Debug.WriteLine("List count: " + l.Count());
+
+
+            //Custom item = new Custom();
+            //item = l.ElementAt(0);
+            int newId = 0;
+            l.ForEach(item =>
+            {
+                Custom c = new Custom();
+                //c.ID = newId;
+                c.ImageURL = item.ImageURL;
+                c.Info = item.Info;
+                c.Link = item.Link;
+                c.Rss = item.Rss;
+                c.Source = item.Source;
+                c.Text = item.Text;
+                c.Title = item.Title;
+                c.Date = item.Date;
+                c.Category = item.Category;
+
+                _context.Customs.Add(c);
+
+                newId++;
+            });
+
+
+
+            //_context.Entry<Custom>(c).State = EntityState.Added;
+
+            _context.SaveChanges();
+            //_context.Customs.Update(c);
+
+
+
+
+            //_context.Database.ExecuteSqlCommand(
+            //        "DBCC CHECKIDENT('Customs', RESEED,  0 )",
+            //        new SqlParameter("lastRowId", 0)
+            //    );
+            Custom cc = new Custom();
+            return cc;
         }
 
         private bool CustomExists(int id)

@@ -1,12 +1,13 @@
-<div *ngFor="let feed of list">
+<div style="margin-bottom: 20px" *ngFor="let feed of globalList">
     <div class="col-md-10 blogShort">
         <h1>{{feed.Title}}</h1>
         <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->
         <article>
             <div [innerHTML]="feed.Text"></div>
         </article>
+        <br>
         <em>{{feed.Date}}</em>
-        <p>{{feed.Source}}</p>
+        <p style="margin-bottom: 0px">{{feed.Source}}</p>
         <a (click)="categoryService.populate(feed.Category)"  routerLink="/category">{{feed.Category}}</a>
         <br>
         <a [href]="feed.Link">Läs mer</a> 

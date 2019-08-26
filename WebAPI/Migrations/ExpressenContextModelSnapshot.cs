@@ -30,8 +30,7 @@ namespace Nyhetssajt.Migrations
                     b.Property<string>("Date")
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("ImageURL")
-                        .HasColumnType("nvarchar(250)");
+                    b.Property<string>("ImageURL");
 
                     b.Property<string>("Link")
                         .HasColumnType("nvarchar(250)");

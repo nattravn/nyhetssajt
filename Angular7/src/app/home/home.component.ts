@@ -6,6 +6,8 @@ import { SvdService } from '../shared/svd.service';
 import { Nt } from '../shared/nt.model';
 import { Svd } from '../shared/svd.model';
 import { CategoryService } from '../shared/category.service';
+import { CustomService } from '../shared/custom.service';
+import { Custom } from '../shared/custom.model';
 
 
 @Component({
@@ -15,34 +17,46 @@ import { CategoryService } from '../shared/category.service';
 })
 export class HomeComponent implements OnInit {
 
-  public list: Expressen[];
+  public globalList: Expressen[]= new Array<Expressen>();
 
   constructor(private expressenService: ExpressenService, 
               private ntService: NtService, 
               private svdService: SvdService,
+              private customService: CustomService,
               private categoryService: CategoryService ) { }
 
   ngOnInit() {
-    this.list = new Array<Expressen>();
 
     this.expressenService.getExpressen().then((expressenItem: Expressen[]) =>{
       this.svdService.getSvd().then((svdItem: Svd[]) =>{
         this.ntService.getNt().then((ntItem: Nt[]) =>{
+          this.customService.getCustom().then((customItem: Custom[]) =>{
+            ntItem.forEach(item =>{
+              console.log("item.Source: ", item.Source);
+              item.Source="Norrköpings Tidning";
+              this.globalList.push(item)
+            })
+            svdItem.forEach(item =>{
+              console.log("item.Source: ", item.Source);
+              item.Source="Svd";
+              this.globalList.push(item)
+            })
+            expressenItem.forEach(item =>{
+              console.log("item.Source: ", item.Source);
+              item.Source="Expressen";
+              this.globalList.push(item)
+            })
 
-          ntItem.forEach(item =>{
-            item.Source="Norrköpings Tidning";
-            this.list.push(item)
-          })
-          svdItem.forEach(item =>{
-            item.Source="Svd";
-            this.list.push(item)
-          })
-          expressenItem.forEach(item =>{
-            item.Source="Expressen";
-            this.list.push(item)
-          })
+            customItem.forEach(item => {
+              console.log("item.Source: ", item.Source);
+              this.globalList.push(item)
+            });
 
-          this.list.sort((a,b) => b.Date.localeCompare(a.Date));
+            console.log("this.list: ", this.globalList.length);
+
+            this.globalList.sort((a,b) => b.Date.localeCompare(a.Date));
+            this.globalList = this.globalList.slice(0,10);
+          })
         })
       })
     })

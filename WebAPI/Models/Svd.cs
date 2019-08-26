@@ -13,7 +13,7 @@ namespace Nyhetssajt.Models
         public int ID { get; set; }
         [Column(TypeName = "nvarchar(MAX)")]
         public string Title { get; set; }
-        [Column(TypeName = "nvarchar(250)")]
+
         public string ImageURL { get; set; }
 
         public string Text { get; set; }

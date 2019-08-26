@@ -25,12 +25,17 @@ export class ExpressenService {
     Source: ""
   }]
 
+  sourceInfo:string = "";
+  sourceName:string = "";
+  
   private rssUrl: string = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
+  
 
   constructor(private http: HttpClient, private feed: Expressen) { 
     
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
-
+      this.sourceInfo = res.feed.description;
+      this.sourceName = res.feed.title;
       res.items.forEach((item, index )=> {
         this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.Date = item.pubDate;

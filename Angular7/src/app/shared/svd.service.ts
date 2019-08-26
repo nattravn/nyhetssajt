@@ -18,11 +18,18 @@ export class SvdService {
     Source: ""
   }]
 
+  sourceInfo: string = "";
+  sourceName: string = "";
+
   private rssUrl: string = "https://www.svd.se/?service=rss";
 
   constructor(private http: HttpClient, private feed: Svd) { 
     
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
+
+      //console.log("res: ", res.feed.description);
+      this.sourceInfo = res.feed.description;
+      this.sourceName = res.feed.title;
 
       res.items.forEach((item, index )=> {
         this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
@@ -32,7 +39,9 @@ export class SvdService {
         this.feed.ImageURL = item.thumbnail;
         this.feed.ID = 0;
         this.feed.Title = item.title;
-        this.feed.Source = "Expressen";
+        this.feed.Source = "Svd";
+
+        
         
         // only adds the last item???
         //this.list.push(this.feed);
