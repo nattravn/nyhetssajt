@@ -3,7 +3,7 @@ import { FormGroup, FormControl } from '@angular/forms';
 
 import { HttpClient } from '@angular/common/http';
 import { Expressen } from './expressen.model';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { CustomComponent } from '../custom/custom.component';
 import { Custom } from './custom.model';
 import { async } from 'q';
@@ -21,11 +21,19 @@ export class CustomService {
   sourceList: Array<Custom> = new Array<Custom>();
   
   readonly rootURL = "http://localhost:44380/api";
-  constructor(private http: HttpClient, private feed: Custom) { 
+  constructor(private http: HttpClient, private feed: Custom, private route: ActivatedRoute) { 
     console.log("update");
-    this.setCustoms().then(res =>{
-      console.log("res: ", res);
-    })
+
+    this.route.queryParams
+      .subscribe(params => {
+        console.log("sourceParam: ", params.sourceParam); // {order: "popular"}
+
+          this.setCustoms(params.sourceParam);
+        
+        
+      });
+
+    
     
   }
 
@@ -95,11 +103,10 @@ export class CustomService {
 
   }
 
-   async setCustoms(): Promise<Array<string>>{
+   setCustoms(sourceParam: string){
+
     this.getCustom().then(async res =>{
       let dbRows = res as Custom[];
-      let sourceInfo1: Array<string> = new Array<string>();
-      let sourceName1: Array<string> = new Array<string>();
       dbRows.forEach(async (dbRow, dbRowIndex )=>{
         if(dbRowIndex == 0){
           this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+dbRows[0].Rss).toPromise().then(res  =>{
@@ -122,9 +129,8 @@ export class CustomService {
               this.updateCustom(this.feed);
             });
           });
-
-          this.customRoutes.push(dbRows[0].Source);
-          this.sourceList.push(dbRows[0]);
+          this.sourceList.indexOf(dbRows[0]) === -1 ? this.sourceList.push(dbRows[0]) : console.log("This item already exists");
+          this.customRoutes.indexOf(dbRows[0].Source) === -1 ? this.customRoutes.push(dbRows[0].Source) : console.log("This item already exists");
         }
         
         // here we identify when we get a new source from the table
@@ -154,11 +160,12 @@ export class CustomService {
             });
             return [this.sourceInfo, this.sourceName];
           });
-          this.customRoutes.push(dbRows[dbRowIndex+1].Source);
-          this.sourceList.push(dbRows[dbRowIndex+1]);
-          console.log("tja:", tja);
+
+          this.sourceList.indexOf(dbRows[dbRowIndex+1]) === -1 ? this.sourceList.push(dbRows[dbRowIndex+1]) : console.log("This item already exists");
+          this.customRoutes.indexOf(dbRows[dbRowIndex+1].Source) === -1 ? this.customRoutes.push(dbRows[dbRowIndex+1].Source) : console.log("This item already exists");
+
           this.list = dbRows;
-          this.updateList("Aftonbladet");
+          this.updateList(sourceParam);
         }
         
       })
