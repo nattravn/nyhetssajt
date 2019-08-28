@@ -7,8 +7,8 @@
       </article>
       <em>{{feed.Date}}</em>
       <br>
-      <p >{{feed.Category}}</p>
+      <a (click)="categoryService.populate(feed.Category)"  routerLink="/category">{{feed.Category}}</a>
       <br>
-      <a class="btn btn-blog pull-right marginBottom10" [href]="feed.Link">Läs mer</a> 
+      <a [href]="feed.Link">Läs mer</a> 
   </div>
 </div>

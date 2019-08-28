@@ -111,70 +111,40 @@ namespace Nyhetssajt.Controllers
                 await _context.SaveChangesAsync();
                 Debug.WriteLine("Delete id: " + (id + i));
 
-
             }
             
+            //List<Custom> l = _context.Customs.ToList();
 
-            var y = _context.Customs;
-            List<Custom> l = y.ToList();
+            //int n = _context.Customs.Count();
 
-            int n = _context.Customs.Count();
-            Debug.WriteLine("n before: " + n);
+            //var itemsToDelete = _context.Set<Custom>();
+            //_context.Customs.RemoveRange(itemsToDelete);
+            //_context.SaveChanges();
 
-            var itemsToDelete = _context.Set<Custom>();
-            _context.Customs.RemoveRange(itemsToDelete);
-            _context.SaveChanges();
-            //await _context.Customs.ForEachAsync(e =>
+            //_context.Database.ExecuteSqlCommand("DELETE FROM Customs DBCC CHECKIDENT('Customs', RESEED,  0 )");
+
+            //n = _context.Customs.Count();
+            //Debug.WriteLine("n after: " + n);
+            //Debug.WriteLine("List count: " + l.Count());
+
+            //l.ForEach(item =>
             //{
-            //     _context.Customs.Remove(e);
+            //    Custom c = new Custom();
+            //    c.ImageURL = item.ImageURL;
+            //    c.Info = item.Info;
+            //    c.Link = item.Link;
+            //    c.Rss = item.Rss;
+            //    c.Source = item.Source;
+            //    c.Text = item.Text;
+            //    c.Title = item.Title;
+            //    c.Date = item.Date;
+            //    c.Category = item.Category;
 
+            //    _context.Customs.Add(c);
             //});
 
-            //await _context.SaveChangesAsync();
-
-            _context.Database.ExecuteSqlCommand("DELETE FROM Customs DBCC CHECKIDENT('Customs', RESEED,  0 )");
-           // _context.Database.ExecuteSqlCommand("DELETE FROM Customs");
-            n = _context.Customs.Count();
-            Debug.WriteLine("n after: " + n);
-            Debug.WriteLine("List count: " + l.Count());
-
-
-            //Custom item = new Custom();
-            //item = l.ElementAt(0);
-            int newId = 0;
-            l.ForEach(item =>
-            {
-                Custom c = new Custom();
-                //c.ID = newId;
-                c.ImageURL = item.ImageURL;
-                c.Info = item.Info;
-                c.Link = item.Link;
-                c.Rss = item.Rss;
-                c.Source = item.Source;
-                c.Text = item.Text;
-                c.Title = item.Title;
-                c.Date = item.Date;
-                c.Category = item.Category;
-
-                _context.Customs.Add(c);
-
-                newId++;
-            });
-
-
-
-            //_context.Entry<Custom>(c).State = EntityState.Added;
-
             _context.SaveChanges();
-            //_context.Customs.Update(c);
 
-
-
-
-            //_context.Database.ExecuteSqlCommand(
-            //        "DBCC CHECKIDENT('Customs', RESEED,  0 )",
-            //        new SqlParameter("lastRowId", 0)
-            //    );
             Custom cc = new Custom();
             return cc;
         }

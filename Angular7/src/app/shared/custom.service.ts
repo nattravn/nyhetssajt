@@ -106,7 +106,7 @@ export class CustomService {
    setCustoms(sourceParam: string){
 
     this.getCustom().then(async res =>{
-      let dbRows = res as Custom[];
+      let dbRows = res as Custom[];  
       dbRows.forEach(async (dbRow, dbRowIndex )=>{
         if(dbRowIndex == 0){
           this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+dbRows[0].Rss).toPromise().then(res  =>{
@@ -117,7 +117,7 @@ export class CustomService {
               this.feed.Text =  rssItem.content;
               this.feed.Link = rssItem.link;
               this.feed.ImageURL = rssItem.thumbnail;
-              this.feed.ID = dbRowIndex+rssItemIndex+1;
+              this.feed.ID = dbRows[rssItemIndex].ID;
               this.feed.Title = rssItem.title;
               this.feed.Source = dbRows[0].Source;
               this.feed.Rss = dbRows[0].Rss;
@@ -129,11 +129,12 @@ export class CustomService {
               this.updateCustom(this.feed);
             });
           });
-          this.sourceList.indexOf(dbRows[0]) === -1 ? this.sourceList.push(dbRows[0]) : console.log("This item already exists");
-          this.customRoutes.indexOf(dbRows[0].Source) === -1 ? this.customRoutes.push(dbRows[0].Source) : console.log("This item already exists");
+          if(this.customRoutes.indexOf(dbRows[0].Source) === -1 ) {
+            this.customRoutes.push(dbRows[0].Source);
+            this.sourceList.push(dbRows[0]); 
+          }
         }
-        
-        // here we identify when we get a new source from the table
+
         if(dbRowIndex < dbRows.length-1 && dbRows[dbRowIndex].Source != dbRows[dbRowIndex+1].Source  ){
 
           const tja =await this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+dbRows[dbRowIndex+1].Rss).toPromise().then(res  =>{
@@ -145,7 +146,7 @@ export class CustomService {
               this.feed.Text =  rssItem.content;
               this.feed.Link = rssItem.link;
               this.feed.ImageURL = rssItem.thumbnail;
-              this.feed.ID = dbRowIndex+rssItemIndex+1+1;
+              this.feed.ID = dbRows[dbRowIndex+rssItemIndex+1].ID;
               this.feed.Title = rssItem.title;
               this.feed.Source = dbRows[dbRowIndex+1].Source;
               this.feed.Rss = dbRows[dbRowIndex+1].Rss;
@@ -161,18 +162,14 @@ export class CustomService {
             return [this.sourceInfo, this.sourceName];
           });
 
-          this.sourceList.indexOf(dbRows[dbRowIndex+1]) === -1 ? this.sourceList.push(dbRows[dbRowIndex+1]) : console.log("This item already exists");
-          this.customRoutes.indexOf(dbRows[dbRowIndex+1].Source) === -1 ? this.customRoutes.push(dbRows[dbRowIndex+1].Source) : console.log("This item already exists");
-
+          if(this.customRoutes.indexOf(dbRows[dbRowIndex+1].Source) === -1 ) {
+            this.customRoutes.push(dbRows[dbRowIndex+1].Source);
+            this.sourceList.push(dbRows[dbRowIndex+1]) 
+          }
+        }
           this.list = dbRows;
           this.updateList(sourceParam);
-        }
-        
       })
-
-      //dbRows.sort((a,b) => b.Date.localeCompare(a.Date));
-
-      
     })
     return (this.sourceName)
   }
