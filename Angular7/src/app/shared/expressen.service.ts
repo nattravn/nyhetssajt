@@ -2,6 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Expressen } from './expressen.model';
+import { FileSaverService } from 'ngx-filesaver';
 import { Observable, bindNodeCallback } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 // import { parseString, parseFile, parseURL, RSSParsed } from 'rss-parser';
@@ -31,10 +32,14 @@ export class ExpressenService {
   private rssUrl: string = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
   
 
-  constructor(private http: HttpClient, private feed: Expressen) { 
+  constructor(private http: HttpClient, private feed: Expressen, private _FileSaverService: FileSaverService) { 
     
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
-      this.sourceInfo = res.feed.description;
+    var s = 5;
+    const fileType = _FileSaverService.genType("json");
+    const txtBlob = new Blob([JSON.stringify(res)], { type: fileType });
+    _FileSaverService.save(txtBlob,"test.json");
+    this.sourceInfo = res.feed.description;
       this.sourceName = res.feed.title;
       res.items.forEach((item, index )=> {
         this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;

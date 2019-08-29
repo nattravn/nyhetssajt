@@ -177,11 +177,11 @@ export class CustomService {
   async updateList(route: string){
     this.currentRoute = route;
     this.activeList = [];
-    console.log("list: ", this.list);
+
     this.list.forEach((item, index)=> {
-      console.log(item.Source + " == " + route);
+
       if(item.Source == route){
-        console.log(" this.sourceInfo[index]: " , this.sourceInfo[index]);
+
         this.currentSourceInfo = this.sourceInfo[index];
         this.currentSourceName = this.sourceName[index];
         this.activeList.push(item);
