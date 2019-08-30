@@ -4,12 +4,13 @@ import { HttpClient } from '@angular/common/http';
 import { Expressen } from './expressen.model';
 import { FileSaverService } from 'ngx-filesaver';
 import { Observable, bindNodeCallback } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map, tap, startWith } from 'rxjs/operators';
 // import { parseString, parseFile, parseURL, RSSParsed } from 'rss-parser';
 
 
 //https://github.com/ardatan/angular-rss-reader/blob/master/src/app/rss-feed.component.ts
 
+const CACHE_KEY = "httpRssCache";
 @Injectable({
   providedIn: 'root'
 })
@@ -28,18 +29,23 @@ export class ExpressenService {
 
   sourceInfo:string = "";
   sourceName:string = "";
+  feeds;
   
   private rssUrl: string = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
   
 
   constructor(private http: HttpClient, private feed: Expressen, private _FileSaverService: FileSaverService) { 
     
-    this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
-    var s = 5;
-    const fileType = _FileSaverService.genType("json");
-    const txtBlob = new Blob([JSON.stringify(res)], { type: fileType });
-    _FileSaverService.save(txtBlob,"test.json");
-    this.sourceInfo = res.feed.description;
+    this.feeds = this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl)
+
+    this.feeds.subscribe(res =>{
+      var s = 5;
+      console.log("res: ", res);
+      const fileType = _FileSaverService.genType("json");
+      const txtBlob = new Blob([JSON.stringify(res)], { type: fileType });
+      //_FileSaverService.save(txtBlob,"test.json");
+      localStorage[CACHE_KEY] = JSON.stringify(res.items);
+      this.sourceInfo = res.feed.description;
       this.sourceName = res.feed.title;
       res.items.forEach((item, index )=> {
         this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
@@ -54,6 +60,7 @@ export class ExpressenService {
         // only adds the last item???
         //this.list.push(this.feed);
 
+        //you can switch this to put if the database already is populated, but then you cant use 0 as id
         this.postExpressen(this.feed).subscribe(res => {
           console.log("feed inserted");
         },
@@ -62,13 +69,18 @@ export class ExpressenService {
           debugger;
         })
       });
-      
-      this.getExpressen().then(res =>{
-        let array = res as Expressen[];
-        array.sort((a,b) => b.Date.localeCompare(a.Date));
-        this.list = array;
-      });
     })
+
+    this.getExpressen().then(res =>{
+      let array = res as Expressen[];
+      array.sort((a,b) => b.Date.localeCompare(a.Date));
+      //this.list = array;
+    });
+
+    this.list = this.feeds.pipe(
+      startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
+    )
+    console.log("this.list: ", this.list);
   }
 
   postExpressen(feed : Expressen){

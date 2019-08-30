@@ -27,14 +27,8 @@ export class CustomService {
     this.route.queryParams
       .subscribe(params => {
         console.log("sourceParam: ", params.sourceParam); // {order: "popular"}
-
           this.setCustoms(params.sourceParam);
-        
-        
       });
-
-    
-    
   }
 
   form: FormGroup = new FormGroup({
@@ -50,7 +44,7 @@ export class CustomService {
   insertCustom(news){
     //https://www.svt.se/nyheter/rss.xml
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+news.Rss).toPromise().then(res  =>{
-
+      
       res.items.forEach((item, index )=> {
         this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.Date = item.pubDate;
@@ -104,39 +98,12 @@ export class CustomService {
   }
 
    setCustoms(sourceParam: string){
-
     this.getCustom().then(async res =>{
       let dbRows = res as Custom[];  
       dbRows.forEach(async (dbRow, dbRowIndex )=>{
-        if(dbRowIndex == 0){
-          this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+dbRows[0].Rss).toPromise().then(res  =>{
-            
-            res.items.forEach(( rssItem, rssItemIndex )=> {
-              this.feed.Category =  rssItem.categories.length > 0 ? rssItem.categories[0] : null ;
-              this.feed.Date = rssItem.pubDate;
-              this.feed.Text =  rssItem.content;
-              this.feed.Link = rssItem.link;
-              this.feed.ImageURL = rssItem.thumbnail;
-              this.feed.ID = dbRows[rssItemIndex].ID;
-              this.feed.Title = rssItem.title;
-              this.feed.Source = dbRows[0].Source;
-              this.feed.Rss = dbRows[0].Rss;
-              this.feed.Info = dbRows[0].Info; 
-
-              this.sourceInfo.push(res.feed.description);
-              this.sourceName.push(res.feed.title);
-
-              this.updateCustom(this.feed);
-            });
-          });
-          if(this.customRoutes.indexOf(dbRows[0].Source) === -1 ) {
-            this.customRoutes.push(dbRows[0].Source);
-            this.sourceList.push(dbRows[0]); 
-          }
-        }
-
-        if(dbRowIndex < dbRows.length-1 && dbRows[dbRowIndex].Source != dbRows[dbRowIndex+1].Source  ){
-
+        
+        if( dbRowIndex % 10 == 0){
+          console.log("new source");
           const tja =await this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+dbRows[dbRowIndex+1].Rss).toPromise().then(res  =>{
 
             res.items.forEach( (rssItem, rssItemIndex )=> {
@@ -146,11 +113,11 @@ export class CustomService {
               this.feed.Text =  rssItem.content;
               this.feed.Link = rssItem.link;
               this.feed.ImageURL = rssItem.thumbnail;
-              this.feed.ID = dbRows[dbRowIndex+rssItemIndex+1].ID;
+              this.feed.ID = dbRows[dbRowIndex+rssItemIndex].ID;
               this.feed.Title = rssItem.title;
-              this.feed.Source = dbRows[dbRowIndex+1].Source;
-              this.feed.Rss = dbRows[dbRowIndex+1].Rss;
-              this.feed.Info = dbRows[dbRowIndex+1].Info;
+              this.feed.Source = dbRows[dbRowIndex].Source;
+              this.feed.Rss = dbRows[dbRowIndex].Rss;
+              this.feed.Info = dbRows[dbRowIndex].Info;
 
               this.sourceInfo.push(res.feed.description);
               this.sourceName.push(res.feed.title);
@@ -162,9 +129,9 @@ export class CustomService {
             return [this.sourceInfo, this.sourceName];
           });
 
-          if(this.customRoutes.indexOf(dbRows[dbRowIndex+1].Source) === -1 ) {
-            this.customRoutes.push(dbRows[dbRowIndex+1].Source);
-            this.sourceList.push(dbRows[dbRowIndex+1]) 
+          if(this.customRoutes.indexOf(dbRows[dbRowIndex].Source) === -1 ) {
+            this.customRoutes.push(dbRows[dbRowIndex].Source);
+            this.sourceList.push(dbRows[dbRowIndex]) 
           }
         }
           this.list = dbRows;
