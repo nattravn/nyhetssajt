@@ -8,14 +8,14 @@ import { Svd } from './svd.model';
 export class SvdService {
   readonly rootURL = "http://localhost:44380/api";
   list: Svd[] = [{
-    ID: 0,
-    Title: "",
+    id: 0,
+    title: "",
     ImageURL: "",
-    Text: "",
-    Date: "",
-    Category: "",
-    Link: "",
-    Source: ""
+    description: "",
+    pubDate: "",
+    category: "",
+    link: "",
+    source: ""
   }]
 
   sourceInfo: string = "";
@@ -32,23 +32,18 @@ export class SvdService {
       this.sourceName = res.feed.title;
 
       res.items.forEach((item, index )=> {
-        this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
-        this.feed.Date = item.pubDate;
-        this.feed.Text =  item.content;
-        this.feed.Link = item.link;
+        this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
+        this.feed.pubDate = item.pubDate;
+        this.feed.description =  item.description;
+        this.feed.link = item.link;
         this.feed.ImageURL = item.thumbnail;
-        this.feed.ID = 0;
-        this.feed.Title = item.title;
-        this.feed.Source = "Svd";
-
-        
-        
-        // only adds the last item???
-        //this.list.push(this.feed);
+        this.feed.id = 0;
+        this.feed.title = item.title;
+        this.feed.source = "Svd";
 
         //to populate the feeds content for the first time change this to post
         this.postSvd(this.feed).subscribe(res => {
-          console.log("feed inserted");
+          console.log("Svd feed inserted");
         },
         err =>{
           console.log("Error: ", err);
@@ -58,7 +53,7 @@ export class SvdService {
       
       this.getSvd().then(res =>{
         let array = res as Svd[];
-        array.sort((a,b) => b.Date.localeCompare(a.Date));
+        array.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
         this.list = array;
       });
     })
@@ -73,6 +68,6 @@ export class SvdService {
   }
 
   putSvd(feed : Svd){
-    return this.http.put(this.rootURL+"/Svds/"+feed.ID, feed);
+    return this.http.put(this.rootURL+"/Svds/"+feed.id, feed);
   }
 }

@@ -11,8 +11,6 @@ import { Router } from '@angular/router';
 export class CustomComponent implements OnInit {
 
   constructor(private router: Router  ,private customService: CustomService, private categoryService : CategoryService) {
-    console.log("this.router: ", this.router.config);
-    this.customService.updateList("Aftonbladet");
   }
 
   ngOnInit() {

@@ -18,7 +18,7 @@ export class CategoryService {
               private customService: CustomService) {
     this.list = new Array<Expressen>();
     
-
+    // pushing all source items to a general list
     this.expressenService.getExpressen().then((expressenItem: Expressen[]) =>{
       this.svdService.getSvd().then((svdItem: Expressen[]) =>{
         this.ntService.getNt().then((ntItem: Expressen[]) =>{
@@ -34,22 +34,23 @@ export class CategoryService {
               this.list.push(item)
             })
             customItem.forEach(item => {
-              console.log("item.Source: ", item.Source);
+              console.log("item.Source: ", item.source);
               this.list.push(item)
             });
           });
 
-          this.list.sort((a,b) => b.Date.localeCompare(a.Date));
+          this.list.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
         })
       })
     })
    }
-
+  
+  // find the category in the general list that match the clicked one
   populate(category: string){
     this.categoryList = new Array<Expressen>();
     console.log("category: ", category);
     this.list.forEach(item =>{
-      if(item.Category == category){
+      if(item.category == category){
         this.categoryList.push(item);
       }
     })

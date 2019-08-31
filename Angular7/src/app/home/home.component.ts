@@ -32,29 +32,29 @@ export class HomeComponent implements OnInit {
         this.ntService.getNt().then((ntItem: Nt[]) =>{
           this.customService.getCustom().then((customItem: Custom[]) =>{
             ntItem.forEach(item =>{
-              console.log("item.Source: ", item.Source);
-              item.Source="Norrköpings Tidning";
+              console.log("item.Source: ", item.source);
+              item.source="Norrköpings Tidning";
               this.globalList.push(item)
             })
             svdItem.forEach(item =>{
-              console.log("item.Source: ", item.Source);
-              item.Source="Svd";
+              console.log("item.Source: ", item.source);
+              item.source="Svd";
               this.globalList.push(item)
             })
             expressenItem.forEach(item =>{
-              console.log("item.Source: ", item.Source);
-              item.Source="Expressen";
+              console.log("item.Source: ", item.source);
+              item.source="Expressen";
               this.globalList.push(item)
             })
 
             customItem.forEach(item => {
-              console.log("item.Source: ", item.Source);
+              console.log("item.Source: ", item.source);
               this.globalList.push(item)
             });
 
             console.log("this.list: ", this.globalList.length);
 
-            this.globalList.sort((a,b) => b.Date.localeCompare(a.Date));
+            this.globalList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
             this.globalList = this.globalList.slice(0,10);
           })
         })

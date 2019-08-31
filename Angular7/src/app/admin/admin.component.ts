@@ -25,11 +25,11 @@ export class AdminComponent implements OnInit {
   }
 
   deleteSource(item: Custom){
-    console.log("item: ", item.ID);
+    console.log("item: ", item.id);
 
 
     console.log("First source");
-    this.customService.deleteCustom(item.ID).subscribe(res =>{
+    this.customService.deleteCustom(item.id).subscribe(res =>{
       console.log("deleted");
     });
 

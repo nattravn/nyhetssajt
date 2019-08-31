@@ -1,10 +1,10 @@
 export class Expressen {
-    ID: number;
-    Title: string;
+    id: number;
+    title: string;
     ImageURL: string;
-    Text: string;
-    Date: string;
-    Category: string;
-    Link: string;
-    Source: string;
+    description: string;
+    pubDate: string;
+    category: string;
+    link: string;
+    source: string;
 }

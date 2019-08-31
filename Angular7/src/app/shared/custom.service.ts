@@ -8,6 +8,14 @@ import { CustomComponent } from '../custom/custom.component';
 import { Custom } from './custom.model';
 import { async } from 'q';
 
+interface Source {
+  sourceInfo: string;
+  sourceName: string;
+  source: string;
+
+}
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -16,9 +24,8 @@ export class CustomService {
   list: Custom[]= [];
   activeList: Custom[] = [];
   customRoutes :string[] = [];
-  currentRoute: string;
-
-  sourceList: Array<Custom> = new Array<Custom>();
+  sources: Source[] = [];
+  activeRoute: string;
   
   readonly rootURL = "http://localhost:44380/api";
   constructor(private http: HttpClient, private feed: Custom, private route: ActivatedRoute) { 
@@ -27,7 +34,10 @@ export class CustomService {
     this.route.queryParams
       .subscribe(params => {
         console.log("sourceParam: ", params.sourceParam); // {order: "popular"}
-          this.setCustoms(params.sourceParam);
+          if(params.sourceParam){
+            this.setCustoms(params.sourceParam);
+          }
+          
       });
   }
 
@@ -37,25 +47,27 @@ export class CustomService {
     Rss: new FormControl("")
   })
 
+  
+  
   sourceInfo: Array<string> = new Array<string>();
   sourceName: Array<string> = new Array<string>();
-  currentSourceInfo:string = ""; 
-  currentSourceName:string = ""; 
+  activeSourceInfo:string = ""; 
+  activeSourceName:string = ""; 
   insertCustom(news){
     //https://www.svt.se/nyheter/rss.xml
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+news.Rss).toPromise().then(res  =>{
       
       res.items.forEach((item, index )=> {
-        this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
-        this.feed.Date = item.pubDate;
-        this.feed.Text =  item.content;
-        this.feed.Link = item.link;
+        this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
+        this.feed.pubDate = item.pubDate;
+        this.feed.description =  item.description;
+        this.feed.link = item.link;
         this.feed.ImageURL = item.thumbnail;
-        this.feed.ID = 0;
-        this.feed.Title = item.title;
-        this.feed.Source = news.Source;
-        this.feed.Rss = news.Rss;
-        this.feed.Info = news.Info;
+        this.feed.id = 0;
+        this.feed.title = item.title;
+        this.feed.source = news.Source;
+        this.feed.rss = news.Rss;
+        this.feed.info = news.Info;
         
         // only adds the last item???
         //this.list.push(this.feed);        
@@ -73,7 +85,7 @@ export class CustomService {
 
       this.getCustom().then(res =>{
         let array = res as Custom[];
-        array.sort((a,b) => b.Date.localeCompare(a.Date));
+        array.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
         this.list = array;
       });
     })
@@ -88,7 +100,7 @@ export class CustomService {
   }
 
   updateCustom(feed : Custom){
-    return this.http.put(this.rootURL+"/Customs/" + feed.ID, feed).toPromise();
+    return this.http.put(this.rootURL+"/Customs/" + feed.id, feed).toPromise();
   }
 
   deleteCustom(id : number){
@@ -97,66 +109,67 @@ export class CustomService {
 
   }
 
-   setCustoms(sourceParam: string){
+  setCustoms(sourceParam: string){
     this.getCustom().then(async res =>{
-      let dbRows = res as Custom[];  
-      dbRows.forEach(async (dbRow, dbRowIndex )=>{
-        
-        if( dbRowIndex % 10 == 0){
-          console.log("new source");
-          const tja =await this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+dbRows[dbRowIndex+1].Rss).toPromise().then(res  =>{
+      let tabelRows = res as Custom[];  
+      //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
+      for (let dbRowIndex = 0; dbRowIndex < tabelRows.length; dbRowIndex+=10) {
+        this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+tabelRows[dbRowIndex].rss).toPromise().then(async rss  =>{
 
-            res.items.forEach( (rssItem, rssItemIndex )=> {
+          rss.items.forEach( (rssItem, rssItemIndex )=> {
 
-              this.feed.Category =  rssItem.categories.length > 0 ? rssItem.categories[0] : null ;
-              this.feed.Date = rssItem.pubDate;
-              this.feed.Text =  rssItem.content;
-              this.feed.Link = rssItem.link;
-              this.feed.ImageURL = rssItem.thumbnail;
-              this.feed.ID = dbRows[dbRowIndex+rssItemIndex].ID;
-              this.feed.Title = rssItem.title;
-              this.feed.Source = dbRows[dbRowIndex].Source;
-              this.feed.Rss = dbRows[dbRowIndex].Rss;
-              this.feed.Info = dbRows[dbRowIndex].Info;
+            this.feed.category =  rssItem.categories.length > 0 ? rssItem.categories[0] : null ;
+            this.feed.pubDate = rssItem.pubDate;
+            this.feed.description =  rssItem.description;
+            this.feed.link = rssItem.link;
+            this.feed.ImageURL = rssItem.thumbnail;
+            this.feed.id = tabelRows[dbRowIndex+rssItemIndex].id;
+            this.feed.title = rssItem.title;
+            this.feed.source = tabelRows[dbRowIndex].source;
+            this.feed.rss = tabelRows[dbRowIndex].rss;
+            this.feed.info = tabelRows[dbRowIndex].info;
 
-              this.sourceInfo.push(res.feed.description);
-              this.sourceName.push(res.feed.title);
-              
-              this.updateCustom(this.feed);
-
-              
-            });
-            return [this.sourceInfo, this.sourceName];
+            this.updateCustom(this.feed);
+            
           });
 
-          if(this.customRoutes.indexOf(dbRows[dbRowIndex].Source) === -1 ) {
-            this.customRoutes.push(dbRows[dbRowIndex].Source);
-            this.sourceList.push(dbRows[dbRowIndex]) 
+          // add source-info and source-routes
+          if(this.customRoutes.indexOf(tabelRows[dbRowIndex].source) === -1){
+            console.log("this.sources: ", this.sources);
+            this.sources.push({"sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": tabelRows[dbRowIndex].source});
+            this.customRoutes.push(tabelRows[dbRowIndex].source);
           }
-        }
-          this.list = dbRows;
-          this.updateList(sourceParam);
-      })
+          
+        });
+      }
+      
+      this.list = tabelRows;
+      //this.updateActiveSource(sourceParam);
+      setTimeout(() => {
+        this.updateActiveSource(sourceParam);
+      }, 200);
+      
     })
-    return (this.sourceName)
   }
 
-  async updateList(route: string){
-    this.currentRoute = route;
+  async updateActiveSource(route: string){
+    this.activeRoute = route;
     this.activeList = [];
 
-    this.list.forEach((item, index)=> {
-
-      if(item.Source == route){
-
-        this.currentSourceInfo = this.sourceInfo[index];
-        this.currentSourceName = this.sourceName[index];
+    this.list.forEach(item=> {
+      if(item.source == route){
         this.activeList.push(item);
       }
     })
+
+    
+     let source = await this.sources.find(x => x.source === route);
+    if(source){
+      
+      this.activeSourceInfo = source.sourceInfo;
+      this.activeSourceName = source.sourceName;
+    }
+    
   }
 
-  set setList(customs: Custom[]){
-    this.list = customs;
-  }
 }

@@ -2,15 +2,15 @@
 <p>{{svdService.sourceInfo}}</p>
 <div *ngFor="let feed of svdService.list">
     <div class="col-md-10 blogShort">
-        <h1>{{feed.Title}}</h1>
+        <h1>{{feed.title}}</h1>
         <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->
         <article>
-            <div [innerHTML]="feed.Text"></div>
+            <div [innerHTML]="feed.description"></div>
         </article>
-        <em>{{feed.Date}}</em>
+        <em>{{feed.pubDate}}</em>
         <br>
-        <a (click)="categoryService.populate(feed.Category)"  routerLink="/category">{{feed.Category}}</a>
+        <a (click)="categoryService.populate(feed.Category)"  routerLink="/category">{{feed.category}}</a>
         <br>
-        <a [href]="feed.Link">Läs mer</a> 
+        <a [href]="feed.link">Läs mer</a> 
     </div>
   </div>

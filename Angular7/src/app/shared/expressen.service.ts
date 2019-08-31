@@ -17,14 +17,14 @@ const CACHE_KEY = "httpRssCache";
 export class ExpressenService {
   readonly rootURL = "http://localhost:44380/api";
   list: Expressen[] = [{
-    ID: 0,
-    Title: "",
+    id: 0,
+    title: "",
     ImageURL: "",
-    Text: "",
-    Date: "",
-    Category: "",
-    Link: "",
-    Source: ""
+    description: "",
+    pubDate: "",
+    category: "",
+    link: "",
+    source: ""
   }]
 
   sourceInfo:string = "";
@@ -32,15 +32,13 @@ export class ExpressenService {
   feeds;
   
   private rssUrl: string = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
-  
 
   constructor(private http: HttpClient, private feed: Expressen, private _FileSaverService: FileSaverService) { 
     
     this.feeds = this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl)
 
     this.feeds.subscribe(res =>{
-      var s = 5;
-      console.log("res: ", res);
+
       const fileType = _FileSaverService.genType("json");
       const txtBlob = new Blob([JSON.stringify(res)], { type: fileType });
       //_FileSaverService.save(txtBlob,"test.json");
@@ -48,21 +46,17 @@ export class ExpressenService {
       this.sourceInfo = res.feed.description;
       this.sourceName = res.feed.title;
       res.items.forEach((item, index )=> {
-        this.feed.Category =  item.categories.length > 0 ? item.categories[0] : null ;
-        this.feed.Date = item.pubDate;
-        this.feed.Text =  item.content;
-        this.feed.Link = item.link;
+        this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
+        this.feed.pubDate = item.pubDate;
+        this.feed.description =  item.description;
+        this.feed.link = item.link;
         this.feed.ImageURL = item.thumbnail;
-        this.feed.ID = 0;
-        this.feed.Title = item.title;
-        this.feed.Source = "Expressen";
-        
-        // only adds the last item???
-        //this.list.push(this.feed);
+        this.feed.id = 0;
+        this.feed.title = item.title;
+        this.feed.source = "Expressen";
 
-        //you can switch this to put if the database already is populated, but then you cant use 0 as id
         this.postExpressen(this.feed).subscribe(res => {
-          console.log("feed inserted");
+          console.log("Express feed inserted");
         },
         err =>{
           console.log("Error: ", err);
@@ -73,14 +67,13 @@ export class ExpressenService {
 
     this.getExpressen().then(res =>{
       let array = res as Expressen[];
-      array.sort((a,b) => b.Date.localeCompare(a.Date));
-      //this.list = array;
+      array.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+      this.list = array;
     });
 
-    this.list = this.feeds.pipe(
-      startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
-    )
-    console.log("this.list: ", this.list);
+    // this.list = this.feeds.pipe(
+    //   startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
+    // )
   }
 
   postExpressen(feed : Expressen){
@@ -92,7 +85,7 @@ export class ExpressenService {
   }
 
   putExpressen(feed : Expressen){
-    return this.http.put(this.rootURL+"/Expressens/"+feed.ID, feed);
+    return this.http.put(this.rootURL+"/Expressens/"+feed.id, feed);
   }
   
 }

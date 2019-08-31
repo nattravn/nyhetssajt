@@ -8,7 +8,6 @@ let CustomComponent = class CustomComponent {
         this.router = router;
         this.customService = customService;
         this.categoryService = categoryService;
-        console.log("this.router: ", this.router.config);
     }
     ngOnInit() {
     }

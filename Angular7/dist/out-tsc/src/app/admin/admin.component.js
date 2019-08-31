@@ -12,6 +12,24 @@ let AdminComponent = class AdminComponent {
     onSubmit() {
         this.customService.insertCustom(this.customService.form.value);
     }
+    getSources() {
+    }
+    deleteSource(item) {
+        console.log("item: ", item.id);
+        console.log("First source");
+        this.customService.deleteCustom(item.id).subscribe(res => {
+            console.log("deleted");
+        });
+        // Reseed
+        // this.customService.getCustom().then(res =>{
+        //   let dbRows = res as Custom[];
+        //   dbRows.forEach((item, index) =>{
+        //     //item.ID = index+1;
+        //     console.log("item.ID: ", item.ID);
+        //     this.customService.updateCustom(item,item.ID);
+        //   })
+        // });
+    }
 };
 AdminComponent = tslib_1.__decorate([
     Component({

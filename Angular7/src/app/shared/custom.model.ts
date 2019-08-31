@@ -1,12 +1,12 @@
 export class Custom {
-    ID: number;
-    Title: string;
+    id: number;
+    title: string;
     ImageURL: string;
-    Text: string;
-    Date: string;
-    Category: string;
-    Link: string;
-    Source: string;
-    Rss: string;
-    Info: string;
+    description: string;
+    pubDate: string;
+    category: string;
+    link: string;
+    source: string;
+    rss: string;
+    info: string;
 }
