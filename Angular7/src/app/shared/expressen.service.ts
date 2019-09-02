@@ -30,10 +30,13 @@ export class ExpressenService {
   sourceInfo:string = "";
   sourceName:string = "";
   feeds;
+
+  unsortedList: Expressen[] = [];
+  feed: Expressen = new Expressen();
   
   private rssUrl: string = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
 
-  constructor(private http: HttpClient, private feed: Expressen, private _FileSaverService: FileSaverService) { 
+  constructor(private http: HttpClient, private _FileSaverService: FileSaverService) { 
     
     this.feeds = this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl)
 
@@ -45,7 +48,8 @@ export class ExpressenService {
       localStorage[CACHE_KEY] = JSON.stringify(res.items);
       this.sourceInfo = res.feed.description;
       this.sourceName = res.feed.title;
-      res.items.forEach((item, index )=> {
+      res.items.forEach(item => {
+        this.feed = new Expressen();
         this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.pubDate = item.pubDate;
         this.feed.description =  item.description;
@@ -55,21 +59,24 @@ export class ExpressenService {
         this.feed.title = item.title;
         this.feed.source = "Expressen";
 
-        this.postExpressen(this.feed).subscribe(res => {
-          console.log("Express feed inserted");
+        this.unsortedList.push(this.feed);
+
+      });
+      this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+      this.list = this.unsortedList;
+
+      this.list.forEach(item =>{
+        /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned 
+        /* and the item will be inserted on the first row instead */
+        this.postExpressen(item).subscribe(res => {
+          console.log("Svd feed inserted", item);
         },
         err =>{
           console.log("Error: ", err);
           debugger;
         })
-      });
+      })
     })
-
-    this.getExpressen().then(res =>{
-      let array = res as Expressen[];
-      array.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      this.list = array;
-    });
 
     // this.list = this.feeds.pipe(
     //   startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))

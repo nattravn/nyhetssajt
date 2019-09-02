@@ -25,13 +25,16 @@ interface Source {
 export class CustomService {
 
   list: Custom[]= [];
+  unsortedList: Custom[]= [];
   activeList: Custom[] = [];
   customRoutes :string[] = [];
   sources: Source[] = [];
   activeRoute: string;
 
   activeSourceInfo:string = ""; 
-  activeSourceName:string = ""; 
+  activeSourceName:string = "";
+  
+  done: boolean = false;
 
   form: FormGroup = new FormGroup({
     Source: new FormControl(""),
@@ -41,11 +44,15 @@ export class CustomService {
   
   readonly rootURL = "http://localhost:44380/api";
   constructor(private http: HttpClient, private feed: Custom, private route: ActivatedRoute) { 
-    // .route.queryParams are called twice by its design and the first call returns the param as default
-    this.route.queryParams.pipe(
-      skip(1))
+    /* .route.queryParams are always returning and undefined param first by its design,
+       we dont want to run this funtion twice*/
+    this.route.queryParams
       .subscribe(params => {
-        this.setCustoms(params.sourceParam);
+        console.log("setCustoms");
+        if(!this.done){
+          this.setCustoms(params.sourceParam);
+          this.done = false;
+        }
       });
   }
 
@@ -65,24 +72,22 @@ export class CustomService {
         this.feed.rss = news.Rss;
         this.feed.info = news.Info;
         
-        // only adds the last item???
-        //this.list.push(this.feed);        
-        this.postCustom(this.feed).subscribe(res => {
-          console.log("feed inserted");
+        this.unsortedList.push(this.feed);
+        
+      });
+
+      this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+      this.list = this.unsortedList;
+      this.customRoutes.push(news.Source);
+
+      this.list.forEach(item =>{
+        this.postCustom(item).subscribe(res => {
+          console.log("Custom feed inserted");
         },
         err =>{
           console.log("Error: ", err);
           debugger;
         })
-      });
-
-      //this.list = new Array<Custom>();
-      this.customRoutes.push(news.Source);
-
-      this.getCustom().then(res =>{
-        let array = res as Custom[];
-        array.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-        this.list = array;
       });
     })
   }
@@ -100,9 +105,7 @@ export class CustomService {
   }
 
   deleteCustom(id : number){
-
     return this.http.delete(this.rootURL+"/Customs/" + id);
-
   }
 
   setCustoms(sourceParam: string){
@@ -136,7 +139,6 @@ export class CustomService {
             this.sources.push({"sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": tabelRows[dbRowIndex].source});
             this.customRoutes.push(tabelRows[dbRowIndex].source);
           }
-          
         });
       }
       
@@ -165,7 +167,6 @@ export class CustomService {
       this.activeSourceInfo = source.sourceInfo;
       this.activeSourceName = source.sourceName;
     }
-    
   }
 
 }
