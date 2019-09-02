@@ -46,7 +46,7 @@ namespace Nyhetssajt.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutNt(int id, Nt nt)
         {
-            if (id != nt.ID)
+            if (id != nt.id)
             {
                 return BadRequest();
             }
@@ -84,7 +84,7 @@ namespace Nyhetssajt.Controllers
             _context.Nts.Add(nt);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetNt", new { id = nt.ID }, nt);
+            return CreatedAtAction("GetNt", new { id = nt.id }, nt);
         }
 
         // DELETE: api/Nts/5
@@ -105,7 +105,7 @@ namespace Nyhetssajt.Controllers
 
         private bool NtExists(int id)
         {
-            return _context.Nts.Any(e => e.ID == id);
+            return _context.Nts.Any(e => e.id == id);
         }
     }
 }

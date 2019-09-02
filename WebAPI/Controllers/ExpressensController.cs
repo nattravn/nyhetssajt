@@ -50,7 +50,7 @@ namespace Nyhetssajt.Controllers
         public async Task<IActionResult> PutExpressen(int id, Expressen expressen)
         {
             Debug.WriteLine("Update feed");
-            if (id != expressen.ID)
+            if (id != expressen.id)
             {
                 return BadRequest();
             }
@@ -88,12 +88,12 @@ namespace Nyhetssajt.Controllers
             _context.Expressens.Add(expressen);
             await _context.SaveChangesAsync();
 
-            Debug.WriteLine("2. expressen.id: " + expressen.ID);
+            Debug.WriteLine("2. expressen.id: " + expressen.id);
 
 
 
 
-            return CreatedAtAction("GetExpressen", new { id = expressen.ID }, expressen);
+            return CreatedAtAction("GetExpressen", new { id = expressen.id }, expressen);
         }
 
         // DELETE: api/Expressens/5
@@ -114,7 +114,7 @@ namespace Nyhetssajt.Controllers
 
         private bool ExpressenExists(int id)
         {
-            return _context.Expressens.Any(e => e.ID == id);
+            return _context.Expressens.Any(e => e.id == id);
         }
     }
 }

@@ -20,35 +20,35 @@ namespace Nyhetssajt.Migrations.Custom
 
             modelBuilder.Entity("Nyhetssajt.Models.Custom", b =>
                 {
-                    b.Property<int>("ID")
+                    b.Property<int>("id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("Category")
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Date")
-                        .HasColumnType("nvarchar(100)");
-
                     b.Property<string>("ImageURL");
 
-                    b.Property<string>("Info");
+                    b.Property<string>("category")
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Link")
+                    b.Property<string>("description");
+
+                    b.Property<string>("info");
+
+                    b.Property<string>("link")
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("Rss")
+                    b.Property<string>("pubDate")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("rss")
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("Source")
+                    b.Property<string>("source")
                         .HasColumnType("nvarchar(250)");
 
-                    b.Property<string>("Text");
-
-                    b.Property<string>("Title")
+                    b.Property<string>("title")
                         .HasColumnType("nvarchar(MAX)");
 
-                    b.HasKey("ID");
+                    b.HasKey("id");
 
                     b.ToTable("Customs");
                 });

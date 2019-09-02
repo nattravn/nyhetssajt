@@ -7,6 +7,9 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { CustomComponent } from '../custom/custom.component';
 import { Custom } from './custom.model';
 import { async } from 'q';
+import { Observable } from 'rxjs';
+import { map, skip } from 'rxjs/operators';
+
 
 interface Source {
   sourceInfo: string;
@@ -26,33 +29,26 @@ export class CustomService {
   customRoutes :string[] = [];
   sources: Source[] = [];
   activeRoute: string;
-  
-  readonly rootURL = "http://localhost:44380/api";
-  constructor(private http: HttpClient, private feed: Custom, private route: ActivatedRoute) { 
-    console.log("update");
 
-    this.route.queryParams
-      .subscribe(params => {
-        console.log("sourceParam: ", params.sourceParam); // {order: "popular"}
-          if(params.sourceParam){
-            this.setCustoms(params.sourceParam);
-          }
-          
-      });
-  }
+  activeSourceInfo:string = ""; 
+  activeSourceName:string = ""; 
 
   form: FormGroup = new FormGroup({
     Source: new FormControl(""),
     Info: new FormControl(""),
     Rss: new FormControl("")
   })
+  
+  readonly rootURL = "http://localhost:44380/api";
+  constructor(private http: HttpClient, private feed: Custom, private route: ActivatedRoute) { 
+    // .route.queryParams are called twice by its design and the first call returns the param as default
+    this.route.queryParams.pipe(
+      skip(1))
+      .subscribe(params => {
+        this.setCustoms(params.sourceParam);
+      });
+  }
 
-  
-  
-  sourceInfo: Array<string> = new Array<string>();
-  sourceName: Array<string> = new Array<string>();
-  activeSourceInfo:string = ""; 
-  activeSourceName:string = ""; 
   insertCustom(news){
     //https://www.svt.se/nyheter/rss.xml
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+news.Rss).toPromise().then(res  =>{
@@ -110,11 +106,12 @@ export class CustomService {
   }
 
   setCustoms(sourceParam: string){
-    this.getCustom().then(async res =>{
-      let tabelRows = res as Custom[];  
+    this.getCustom().then(async rows =>{
+      let tabelRows = rows as Custom[];  
       //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
       for (let dbRowIndex = 0; dbRowIndex < tabelRows.length; dbRowIndex+=10) {
-        this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+tabelRows[dbRowIndex].rss).toPromise().then(async rss  =>{
+        //very important to wait on this get request because we update the active source outside this function
+        await this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+tabelRows[dbRowIndex].rss).toPromise().then(rss  =>{
 
           rss.items.forEach( (rssItem, rssItemIndex )=> {
 
@@ -144,10 +141,7 @@ export class CustomService {
       }
       
       this.list = tabelRows;
-      //this.updateActiveSource(sourceParam);
-      setTimeout(() => {
-        this.updateActiveSource(sourceParam);
-      }, 200);
+      this.updateActiveSource(sourceParam);
       
     })
   }
@@ -156,6 +150,8 @@ export class CustomService {
     this.activeRoute = route;
     this.activeList = [];
 
+    console.log("this.list: ", this.list);
+    await console.log("route: ", route);
     this.list.forEach(item=> {
       if(item.source == route){
         this.activeList.push(item);
@@ -163,7 +159,7 @@ export class CustomService {
     })
 
     
-     let source = await this.sources.find(x => x.source === route);
+    let source = this.sources.find(x => x.source === route);
     if(source){
       
       this.activeSourceInfo = source.sourceInfo;

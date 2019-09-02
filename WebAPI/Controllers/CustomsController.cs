@@ -48,13 +48,12 @@ namespace Nyhetssajt.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCustom(int id, Custom custom)
         {
-            Debug.WriteLine("updated new id: " + id + " from old: " + custom.ID);
-            if (id != custom.ID)
+
+            if (id != custom.id)
             {
                 return BadRequest();
             }
 
-            Debug.WriteLine("updated new id: "+ id + " from old: " + custom.ID);
             _context.Entry(custom).State = EntityState.Modified;
 
             try
@@ -84,7 +83,7 @@ namespace Nyhetssajt.Controllers
             
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCustom", new { id = custom.ID }, custom);
+            return CreatedAtAction("GetCustom", new { id = custom.id }, custom);
         }
 
         // DELETE: api/Customs/5
@@ -151,7 +150,7 @@ namespace Nyhetssajt.Controllers
 
         private bool CustomExists(int id)
         {
-            return _context.Customs.Any(e => e.ID == id);
+            return _context.Customs.Any(e => e.id == id);
         }
     }
 }

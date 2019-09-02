@@ -9,24 +9,24 @@ namespace Nyhetssajt.Models
 {
     public class Custom
     {
-        public int ID { get; set; }
+        public int id { get; set; }
         [Column(TypeName = "nvarchar(MAX)")]
-        public string Title { get; set; }
+        public string title { get; set; }
 
         public string ImageURL { get; set; }
 
-        public string Text { get; set; }
+        public string description { get; set; }
         [Column(TypeName = "nvarchar(100)")]
-        public string Date { get; set; }
+        public string pubDate { get; set; }
         [Column(TypeName = "nvarchar(100)")]
-        public string Category { get; set; }
+        public string category { get; set; }
         [Column(TypeName = "nvarchar(250)")]
-        public string Link { get; set; }
+        public string link { get; set; }
         [Column(TypeName = "nvarchar(250)")]
-        public string Source { get; set; }
+        public string source { get; set; }
         [Column(TypeName = "nvarchar(250)")]
-        public string Rss { get; set; }
+        public string rss { get; set; }
 
-        public string Info { get; set; }
+        public string info { get; set; }
     }
 }

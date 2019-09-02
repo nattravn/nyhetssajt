@@ -48,7 +48,7 @@ namespace Nyhetssajt.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> PutSvd(int id, Svd svd)
         {
-            if (id != svd.ID)
+            if (id != svd.id)
             {
                 return BadRequest();
             }
@@ -90,7 +90,7 @@ namespace Nyhetssajt.Controllers
             _context.Svds.Add(svd);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetSvd", new { id = svd.ID }, svd);
+            return CreatedAtAction("GetSvd", new { id = svd.id }, svd);
         }
 
         // DELETE: api/Svds/5
@@ -111,7 +111,7 @@ namespace Nyhetssajt.Controllers
 
         private bool SvdExists(int id)
         {
-            return _context.Svds.Any(e => e.ID == id);
+            return _context.Svds.Any(e => e.id == id);
         }
     }
 }
