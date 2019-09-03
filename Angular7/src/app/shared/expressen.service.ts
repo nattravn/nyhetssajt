@@ -1,5 +1,5 @@
 
-import { Injectable } from '@angular/core';
+import { Injectable, Pipe } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Expressen } from './expressen.model';
 import { FileSaverService } from 'ngx-filesaver';
@@ -14,27 +14,22 @@ const CACHE_KEY = "httpRssCache";
 @Injectable({
   providedIn: 'root'
 })
+
+@Pipe({
+  name: "orderby"
+})
 export class ExpressenService {
   readonly rootURL = "http://localhost:44380/api";
-  list: Expressen[] = [{
-    id: 0,
-    title: "",
-    ImageURL: "",
-    description: "",
-    pubDate: "",
-    category: "",
-    link: "",
-    source: ""
-  }]
+  list: Expressen[] = [];
+  unsortedList: Expressen[] = [];
+  feed: Expressen;
 
   sourceInfo:string = "";
   sourceName:string = "";
   feeds;
 
-  unsortedList: Expressen[] = [];
-  feed: Expressen = new Expressen();
-  
   private rssUrl: string = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
+  list2: Expressen[];
 
   constructor(private http: HttpClient, private _FileSaverService: FileSaverService) { 
     
@@ -63,13 +58,15 @@ export class ExpressenService {
 
       });
       this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      this.list = this.unsortedList;
+      this.list2 = this.unsortedList;
 
-      this.list.forEach(item =>{
+      console.log("this.list2: ", this.list2);
+
+      this.list2.forEach(item =>{
         /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned 
         /* and the item will be inserted on the first row instead */
         this.postExpressen(item).subscribe(res => {
-          console.log("Svd feed inserted", item);
+          console.log("Expressen feed inserted");
         },
         err =>{
           console.log("Error: ", err);
@@ -78,9 +75,11 @@ export class ExpressenService {
       })
     })
 
-    // this.list = this.feeds.pipe(
-    //   startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
-    // )
+    this.list = this.feeds.pipe(
+      map<any, any>(data => data.items),
+      startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
+    )
+    
   }
 
   postExpressen(feed : Expressen){

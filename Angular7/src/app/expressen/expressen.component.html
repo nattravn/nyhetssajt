@@ -1,6 +1,6 @@
 <h2>{{expressenService.sourceName}}</h2>
 <p>{{expressenService.sourceInfo}}</p>
-<div *ngFor="let feed of expressenService.list">
+<div *ngFor="let feed of expressenService.list | async | orderBy: order : true  ">
     <div class="col-md-10 blogShort">
         <h1>{{feed.title}}</h1>
         <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->

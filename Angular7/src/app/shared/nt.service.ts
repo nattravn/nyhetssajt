@@ -8,31 +8,22 @@ import { Nt } from './nt.model';
 export class NtService {
 
   readonly rootURL = "http://localhost:44380/api";
-  list: Nt[] = [{
-    id: 0,
-    title: "",
-    ImageURL: "",
-    description: "",
-    pubDate: "",
-    category: "",
-    link: "",
-    source: ""
-  }]
+  readonly rssUrl: string = "http://www.nt.se/nyheter/norrkoping/rss/";
 
+  list: Nt[] = []
   unsortedList: Nt[] = [];
-  feed: Nt = new Nt();
+  feed: Nt;
 
   sourceInfo:string = "";
   sourceName:string = "";
 
-  private rssUrl: string = "http://www.nt.se/nyheter/norrkoping/rss/";
-
   constructor(private http: HttpClient) { 
-    
+    /* This get request will return json data containing rss feeds with more than 10 items(news). 
+       We push each item to an unsorted list and then sort it and assign it to the "view" list */
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
       this.sourceInfo = res.feed.description;
       this.sourceName = res.feed.title;
-      console.log("res.items: ", res.items.length);
+      
       res.items.forEach(item=> {
         this.feed = new Nt();
         this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
@@ -50,6 +41,7 @@ export class NtService {
       this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
       this.list = this.unsortedList;
 
+      // Store it in the database
       this.list.forEach(item =>{
         /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned 
         /* and the item will be inserted on the first row instead */

@@ -9,34 +9,22 @@ import { async } from '@angular/core/testing';
 })
 export class SvdService {
   readonly rootURL = "http://localhost:44380/api";
-  list: Svd[] = [{
-    id: 0,
-    title: "",
-    ImageURL: "",
-    description: "",
-    pubDate: "",
-    category: "",
-    link: "",
-    source: ""
-  }]
+  readonly rssUrl: string = "https://www.svd.se/?service=rss";
+
+  list: Svd[] = []
+  unsortedList: Svd[] = [];
+  feed: Svd ;
 
   sourceInfo: string = "";
   sourceName: string = "";
-
-  private rssUrl: string = "https://www.svd.se/?service=rss";
-  unsortedList: Svd[] = [];
-
-  feed: Svd = new Svd();
 
   constructor(private http: HttpClient, private feed2: Svd) { 
     
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
 
-      //console.log("res: ", res.feed.description);
       this.sourceInfo = res.feed.description;
       this.sourceName = res.feed.title;
 
-      console.log("res: ", res);
       res.items.forEach( item=> {
         this.feed = new Svd(); 
         this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
@@ -48,8 +36,7 @@ export class SvdService {
         this.feed.title = item.title;
         this.feed.source = "Svd";
 
-        
-         this.unsortedList.push(this.feed);
+        this.unsortedList.push(this.feed);
 
       });
       this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));

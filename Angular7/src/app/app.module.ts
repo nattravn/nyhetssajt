@@ -23,6 +23,7 @@ import { MaterialModule } from "./material/material.module";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdminComponent } from './admin/admin.component';
 import { FileSaverModule } from 'ngx-filesaver';
+import { OrderModule } from 'ngx-order-pipe';
 
 
 @NgModule({
@@ -44,7 +45,8 @@ import { FileSaverModule } from 'ngx-filesaver';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    FileSaverModule
+    FileSaverModule,
+    OrderModule
     
   ],
   providers: [

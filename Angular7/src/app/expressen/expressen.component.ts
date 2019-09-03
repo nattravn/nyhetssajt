@@ -9,6 +9,7 @@ import { CategoryService } from '../shared/category.service';
 })
 export class ExpressenComponent implements OnInit {
 
+  order: string = 'pubDate';
   constructor(private expressenService: ExpressenService, private categoryService : CategoryService) { }
 
   ngOnInit() {

@@ -1,23 +1,15 @@
 import { Injectable } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-
 import { HttpClient } from '@angular/common/http';
 import { Expressen } from './expressen.model';
-import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { CustomComponent } from '../custom/custom.component';
+import { ActivatedRoute } from '@angular/router';
 import { Custom } from './custom.model';
-import { async } from 'q';
-import { Observable } from 'rxjs';
-import { map, skip } from 'rxjs/operators';
-
 
 interface Source {
   sourceInfo: string;
   sourceName: string;
   source: string;
-
 }
-
 
 @Injectable({
   providedIn: 'root'
@@ -45,7 +37,7 @@ export class CustomService {
   readonly rootURL = "http://localhost:44380/api";
   constructor(private http: HttpClient, private feed: Custom, private route: ActivatedRoute) { 
     /* .route.queryParams are always returning and undefined param first by its design,
-       we dont want to run this funtion twice*/
+    /*  we dont want to run this funtion twice */
     this.route.queryParams
       .subscribe(params => {
         console.log("setCustoms");
@@ -57,7 +49,6 @@ export class CustomService {
   }
 
   insertCustom(news){
-    //https://www.svt.se/nyheter/rss.xml
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+news.Rss).toPromise().then(res  =>{
       
       res.items.forEach((item, index )=> {
@@ -113,7 +104,8 @@ export class CustomService {
       let tabelRows = rows as Custom[];  
       //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
       for (let dbRowIndex = 0; dbRowIndex < tabelRows.length; dbRowIndex+=10) {
-        //very important to wait on this get request because we update the active source outside this function
+        /* very important to wait on this get request because we update the active source outside this get request
+        /* otherwise updateActiveSource will execute before anything has been pushed to this.sources and this.customRoutes */
         await this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+tabelRows[dbRowIndex].rss).toPromise().then(rss  =>{
 
           rss.items.forEach( (rssItem, rssItemIndex )=> {
@@ -135,7 +127,6 @@ export class CustomService {
 
           // add source-info and source-routes
           if(this.customRoutes.indexOf(tabelRows[dbRowIndex].source) === -1){
-            console.log("this.sources: ", this.sources);
             this.sources.push({"sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": tabelRows[dbRowIndex].source});
             this.customRoutes.push(tabelRows[dbRowIndex].source);
           }
@@ -148,22 +139,20 @@ export class CustomService {
     })
   }
 
-  async updateActiveSource(route: string){
-    this.activeRoute = route;
+  updateActiveSource(route: string){
+    //important to empty the active list every time a new source is clicked
     this.activeList = [];
+    this.activeRoute = route;
 
-    console.log("this.list: ", this.list);
-    await console.log("route: ", route);
     this.list.forEach(item=> {
       if(item.source == route){
         this.activeList.push(item);
       }
     })
 
-    
+    // we update the active source info variables with the source that was clicked
     let source = this.sources.find(x => x.source === route);
     if(source){
-      
       this.activeSourceInfo = source.sourceInfo;
       this.activeSourceName = source.sourceName;
     }
