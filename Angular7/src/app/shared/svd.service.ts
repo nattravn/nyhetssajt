@@ -36,17 +36,17 @@ export class SvdService {
         this.feed.title = item.title;
         this.feed.source = "Svd";
 
-        this.unsortedList.push(this.feed);
+        this.list.push(this.feed);
 
       });
-      this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      this.list = this.unsortedList;
+      // this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+      // this.list = this.unsortedList;
 
       this.list.forEach(item =>{
         /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned 
         /* and the item will be inserted on the first row instead */
         this.postSvd(item).subscribe(res => {
-          console.log("Svd feed inserted", item);
+          console.log("Svd feed inserted");
         },
         err =>{
           console.log("Error: ", err);

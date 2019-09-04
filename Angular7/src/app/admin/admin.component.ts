@@ -32,20 +32,6 @@ export class AdminComponent implements OnInit {
     this.customService.deleteCustom(item.id).subscribe(res =>{
       console.log("deleted");
     });
-
-    // Reseed
-    // this.customService.getCustom().then(res =>{
-    //   let dbRows = res as Custom[];
-      
-    //   dbRows.forEach((item, index) =>{
-    //     //item.ID = index+1;
-    //     console.log("item.ID: ", item.ID);
-    //     this.customService.updateCustom(item,item.ID);
-    //   })
-    // });
-
-
-    
   }
 
 }

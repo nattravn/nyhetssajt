@@ -26,7 +26,6 @@ let CategoryService = class CategoryService {
                             this.list.push(item);
                         });
                         customItem.forEach(item => {
-                            console.log("item.Source: ", item.source);
                             this.list.push(item);
                         });
                     });
@@ -37,8 +36,8 @@ let CategoryService = class CategoryService {
     }
     // find the category in the general list that match the clicked one
     populate(category) {
+        console.log("this.list: ", this.list);
         this.categoryList = new Array();
-        console.log("category: ", category);
         this.list.forEach(item => {
             if (item.category == category) {
                 this.categoryList.push(item);

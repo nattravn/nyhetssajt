@@ -6,6 +6,7 @@ let SvdComponent = class SvdComponent {
     constructor(svdService, categoryService) {
         this.svdService = svdService;
         this.categoryService = categoryService;
+        this.order = 'pubDate';
     }
     ngOnInit() {
     }

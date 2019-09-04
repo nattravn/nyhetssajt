@@ -5,6 +5,7 @@ import { NtService } from '../shared/nt.service';
 import { SvdService } from '../shared/svd.service';
 import { CategoryService } from '../shared/category.service';
 import { CustomService } from '../shared/custom.service';
+import { Subject } from 'rxjs';
 let HomeComponent = class HomeComponent {
     constructor(expressenService, ntService, svdService, customService, categoryService) {
         this.expressenService = expressenService;
@@ -13,6 +14,11 @@ let HomeComponent = class HomeComponent {
         this.customService = customService;
         this.categoryService = categoryService;
         this.globalList = new Array();
+        this.isHidden = false;
+        this.loadingVisibilityChange = new Subject();
+        this.loadingVisibilityChange.subscribe((value) => {
+            this.isHidden = value;
+        });
     }
     ngOnInit() {
         this.expressenService.getExpressen().then((expressenItem) => {
@@ -38,6 +44,7 @@ let HomeComponent = class HomeComponent {
                             console.log("item.Source: ", item.source);
                             this.globalList.push(item);
                         });
+                        this.loadingVisibilityChange.next(true);
                         console.log("this.list: ", this.globalList.length);
                         this.globalList.sort((a, b) => b.pubDate.localeCompare(a.pubDate));
                         this.globalList = this.globalList.slice(0, 10);

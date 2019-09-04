@@ -35,11 +35,11 @@ export class NtService {
         this.feed.title = item.title;
         this.feed.source = "Nt";
 
-        this.unsortedList.push(this.feed);
+        this.list.push(this.feed);
       });
 
-      this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      this.list = this.unsortedList;
+      // this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+      // this.list = this.unsortedList;
 
       // Store it in the database
       this.list.forEach(item =>{

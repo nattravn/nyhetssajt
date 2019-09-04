@@ -15,13 +15,11 @@ const CACHE_KEY = "httpRssCache";
   providedIn: 'root'
 })
 
-@Pipe({
-  name: "orderby"
-})
 export class ExpressenService {
   readonly rootURL = "http://localhost:44380/api";
-  list: Expressen[] = [];
+  cacheList: Expressen[] = [];
   unsortedList: Expressen[] = [];
+  databaseList: Expressen[]  = [];
   feed: Expressen;
 
   sourceInfo:string = "";
@@ -29,7 +27,7 @@ export class ExpressenService {
   feeds;
 
   private rssUrl: string = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
-  list2: Expressen[];
+  
 
   constructor(private http: HttpClient, private _FileSaverService: FileSaverService) { 
     
@@ -54,15 +52,13 @@ export class ExpressenService {
         this.feed.title = item.title;
         this.feed.source = "Expressen";
 
-        this.unsortedList.push(this.feed);
+        this.databaseList.push(this.feed);
 
       });
       this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      this.list2 = this.unsortedList;
+      this.databaseList = this.unsortedList;
 
-      console.log("this.list2: ", this.list2);
-
-      this.list2.forEach(item =>{
+      this.databaseList.forEach(item =>{
         /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned 
         /* and the item will be inserted on the first row instead */
         this.postExpressen(item).subscribe(res => {
@@ -75,7 +71,7 @@ export class ExpressenService {
       })
     })
 
-    this.list = this.feeds.pipe(
+    this.cacheList = this.feeds.pipe(
       map<any, any>(data => data.items),
       startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
     )

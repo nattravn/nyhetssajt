@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Expressen } from './expressen.model';
 import { ActivatedRoute } from '@angular/router';
 import { Custom } from './custom.model';
+import { Subject } from 'rxjs';
 
 interface Source {
   sourceInfo: string;
@@ -22,11 +23,15 @@ export class CustomService {
   customRoutes :string[] = [];
   sources: Source[] = [];
   activeRoute: string;
+  adminSourceList: Custom[]= [];
 
   activeSourceInfo:string = ""; 
   activeSourceName:string = "";
-  
+
   done: boolean = false;
+
+  isLoaded: boolean = false;
+  loadingVisibilityChange: Subject<boolean> = new Subject<boolean>();
 
   form: FormGroup = new FormGroup({
     Source: new FormControl(""),
@@ -38,14 +43,17 @@ export class CustomService {
   constructor(private http: HttpClient, private feed: Custom, private route: ActivatedRoute) { 
     /* .route.queryParams are always returning and undefined param first by its design,
     /*  we dont want to run this funtion twice */
-    this.route.queryParams
-      .subscribe(params => {
-        console.log("setCustoms");
-        if(!this.done){
-          this.setCustoms(params.sourceParam);
-          this.done = false;
-        }
-      });
+    this.route.queryParams.subscribe(params => {
+      console.log("setCustoms");
+      if(!this.done){
+        this.setCustoms(params.sourceParam);
+        this.done = false;
+      }
+    });
+
+    this.loadingVisibilityChange.subscribe((value) =>{
+      this.isLoaded = value;
+    })
   }
 
   insertCustom(news){
@@ -63,13 +71,14 @@ export class CustomService {
         this.feed.rss = news.Rss;
         this.feed.info = news.Info;
         
-        this.unsortedList.push(this.feed);
+        this.list.push(this.feed);
         
       });
 
-      this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      this.list = this.unsortedList;
+      // this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+      // this.list = this.unsortedList;
       this.customRoutes.push(news.Source);
+      this.adminSourceList.push(news);
 
       this.list.forEach(item =>{
         this.postCustom(item).subscribe(res => {
@@ -129,6 +138,10 @@ export class CustomService {
           if(this.customRoutes.indexOf(tabelRows[dbRowIndex].source) === -1){
             this.sources.push({"sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": tabelRows[dbRowIndex].source});
             this.customRoutes.push(tabelRows[dbRowIndex].source);
+            this.adminSourceList.push(tabelRows[dbRowIndex]);
+
+            // from here is all data loaded and we want to remove the loadning text by setting the isLoaded variable to true
+            this.loadingVisibilityChange.next(true);
           }
         });
       }

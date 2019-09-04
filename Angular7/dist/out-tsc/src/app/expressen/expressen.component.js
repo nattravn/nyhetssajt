@@ -6,6 +6,7 @@ let ExpressenComponent = class ExpressenComponent {
     constructor(expressenService, categoryService) {
         this.expressenService = expressenService;
         this.categoryService = categoryService;
+        this.order = 'pubDate';
     }
     ngOnInit() {
     }

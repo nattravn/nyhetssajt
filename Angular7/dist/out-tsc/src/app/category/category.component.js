@@ -10,6 +10,7 @@ let CategoryComponent = class CategoryComponent {
         this.ntService = ntService;
         this.svdService = svdService;
         this.categoryService = categoryService;
+        this.order = 'pubDate';
     }
     ngOnInit() {
     }

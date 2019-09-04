@@ -23,6 +23,7 @@ import { MaterialModule } from "./material/material.module";
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AdminComponent } from './admin/admin.component';
 import { FileSaverModule } from 'ngx-filesaver';
+import { OrderModule } from 'ngx-order-pipe';
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
@@ -45,7 +46,8 @@ AppModule = tslib_1.__decorate([
             HttpClientModule,
             FormsModule,
             ReactiveFormsModule,
-            FileSaverModule
+            FileSaverModule,
+            OrderModule
         ],
         providers: [
             ExpressenService,

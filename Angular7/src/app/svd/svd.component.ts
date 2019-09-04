@@ -8,6 +8,7 @@ import { CategoryService } from '../shared/category.service';
 })
 export class SvdComponent implements OnInit {
 
+  order: string = 'pubDate';
   constructor(private svdService : SvdService, private categoryService : CategoryService) { }
 
   ngOnInit() {

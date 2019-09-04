@@ -8,8 +8,15 @@ let CustomComponent = class CustomComponent {
         this.router = router;
         this.customService = customService;
         this.categoryService = categoryService;
+        this.order = 'pubDate';
+        this.isLoaded = false;
     }
     ngOnInit() {
+        console.log("isHidden: ", this.customService.isHidden);
+        this.customService.loadingVisibilityChange.subscribe(value => {
+            this.isLoaded = value;
+            console.log("value: ", value);
+        });
     }
 };
 CustomComponent = tslib_1.__decorate([

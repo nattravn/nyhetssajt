@@ -4,34 +4,43 @@ import { FormGroup, FormControl } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute } from '@angular/router';
 import { Custom } from './custom.model';
+import { Subject } from 'rxjs';
 let CustomService = class CustomService {
     constructor(http, feed, route) {
         this.http = http;
         this.feed = feed;
         this.route = route;
         this.list = [];
+        this.unsortedList = [];
         this.activeList = [];
         this.customRoutes = [];
         this.sources = [];
-        this.rootURL = "http://localhost:44380/api";
+        this.adminSourceList = [];
+        this.activeSourceInfo = "";
+        this.activeSourceName = "";
+        this.done = false;
+        this.isHidden = false;
+        this.loadingVisibilityChange = new Subject();
         this.form = new FormGroup({
             Source: new FormControl(""),
             Info: new FormControl(""),
             Rss: new FormControl("")
         });
-        this.sourceInfo = new Array();
-        this.sourceName = new Array();
-        this.activeSourceInfo = "";
-        this.activeSourceName = "";
-        console.log("update");
-        this.route.queryParams
-            .subscribe(params => {
-            console.log("sourceParam: ", params.sourceParam); // {order: "popular"}
-            this.setCustoms(params.sourceParam);
+        this.rootURL = "http://localhost:44380/api";
+        /* .route.queryParams are always returning and undefined param first by its design,
+        /*  we dont want to run this funtion twice */
+        this.route.queryParams.subscribe(params => {
+            console.log("setCustoms");
+            if (!this.done) {
+                this.setCustoms(params.sourceParam);
+                this.done = false;
+            }
+        });
+        this.loadingVisibilityChange.subscribe((value) => {
+            this.isHidden = value;
         });
     }
     insertCustom(news) {
-        //https://www.svt.se/nyheter/rss.xml
         this.http.get(" https://api.rss2json.com/v1/api.json?rss_url=" + news.Rss).toPromise().then(res => {
             res.items.forEach((item, index) => {
                 this.feed.category = item.categories.length > 0 ? item.categories[0] : null;
@@ -44,21 +53,19 @@ let CustomService = class CustomService {
                 this.feed.source = news.Source;
                 this.feed.rss = news.Rss;
                 this.feed.info = news.Info;
-                // only adds the last item???
-                //this.list.push(this.feed);        
-                this.postCustom(this.feed).subscribe(res => {
-                    console.log("feed inserted");
+                this.list.push(this.feed);
+            });
+            // this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+            // this.list = this.unsortedList;
+            this.customRoutes.push(news.Source);
+            this.adminSourceList.push(news);
+            this.list.forEach(item => {
+                this.postCustom(item).subscribe(res => {
+                    console.log("Custom feed inserted");
                 }, err => {
                     console.log("Error: ", err);
                     debugger;
                 });
-            });
-            //this.list = new Array<Custom>();
-            this.customRoutes.push(news.Source);
-            this.getCustom().then(res => {
-                let array = res;
-                array.sort((a, b) => b.pubDate.localeCompare(a.pubDate));
-                this.list = array;
             });
         });
     }
@@ -75,11 +82,13 @@ let CustomService = class CustomService {
         return this.http.delete(this.rootURL + "/Customs/" + id);
     }
     setCustoms(sourceParam) {
-        this.getCustom().then((res) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-            let tabelRows = res;
+        this.getCustom().then((rows) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+            let tabelRows = rows;
             //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
             for (let dbRowIndex = 0; dbRowIndex < tabelRows.length; dbRowIndex += 10) {
-                this.http.get(" https://api.rss2json.com/v1/api.json?rss_url=" + tabelRows[dbRowIndex].rss).toPromise().then((rss) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                /* very important to wait on this get request because we update the active source outside this get request
+                /* otherwise updateActiveSource will execute before anything has been pushed to this.sources and this.customRoutes */
+                yield this.http.get(" https://api.rss2json.com/v1/api.json?rss_url=" + tabelRows[dbRowIndex].rss).toPromise().then(rss => {
                     rss.items.forEach((rssItem, rssItemIndex) => {
                         this.feed.category = rssItem.categories.length > 0 ? rssItem.categories[0] : null;
                         this.feed.pubDate = rssItem.pubDate;
@@ -93,34 +102,34 @@ let CustomService = class CustomService {
                         this.feed.info = tabelRows[dbRowIndex].info;
                         this.updateCustom(this.feed);
                     });
-                    // add source info and source routes
+                    // add source-info and source-routes
                     if (this.customRoutes.indexOf(tabelRows[dbRowIndex].source) === -1) {
                         this.sources.push({ "sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": tabelRows[dbRowIndex].source });
                         this.customRoutes.push(tabelRows[dbRowIndex].source);
+                        this.adminSourceList.push(tabelRows[dbRowIndex]);
+                        this.loadingVisibilityChange.next(true);
                     }
-                }));
+                });
             }
-            console.log("this.sources: ", this.sources);
             this.list = tabelRows;
-            yield this.updateActiveSource(sourceParam);
+            this.updateActiveSource(sourceParam);
         }));
-        return (this.sourceName);
     }
     updateActiveSource(route) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            this.activeRoute = route;
-            this.activeList = [];
-            this.list.forEach(item => {
-                if (item.source == route) {
-                    this.activeList.push(item);
-                }
-            });
-            let source = this.sources.find(x => x.source === route);
-            if (source) {
-                this.activeSourceInfo = source.sourceInfo;
-                this.activeSourceName = source.sourceName;
+        //important to empty the active list every time a new source is clicked
+        this.activeList = [];
+        this.activeRoute = route;
+        this.list.forEach(item => {
+            if (item.source == route) {
+                this.activeList.push(item);
             }
         });
+        // we update the active source info variables with the source that was clicked
+        let source = this.sources.find(x => x.source === route);
+        if (source) {
+            this.activeSourceInfo = source.sourceInfo;
+            this.activeSourceName = source.sourceName;
+        }
     }
 };
 CustomService = tslib_1.__decorate([

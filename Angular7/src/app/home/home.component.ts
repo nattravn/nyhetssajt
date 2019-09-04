@@ -8,6 +8,7 @@ import { Svd } from '../shared/svd.model';
 import { CategoryService } from '../shared/category.service';
 import { CustomService } from '../shared/custom.service';
 import { Custom } from '../shared/custom.model';
+import { Subject } from 'rxjs';
 
 
 @Component({
@@ -19,11 +20,20 @@ export class HomeComponent implements OnInit {
 
   public globalList: Expressen[]= new Array<Expressen>();
 
+  isLoaded: boolean = false;
+  loadingVisibilityChange: Subject<boolean> = new Subject<boolean>();
+
   constructor(private expressenService: ExpressenService, 
               private ntService: NtService, 
               private svdService: SvdService,
               private customService: CustomService,
-              private categoryService: CategoryService ) { }
+              private categoryService: CategoryService ){ 
+
+    this.loadingVisibilityChange.subscribe((value) =>{
+      console.log("value: ", value);
+      this.isLoaded = value;
+    })
+  }
 
   ngOnInit() {
 
@@ -52,6 +62,7 @@ export class HomeComponent implements OnInit {
               this.globalList.push(item)
             });
 
+            this.loadingVisibilityChange.next(true);
             console.log("this.list: ", this.globalList.length);
 
             this.globalList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));

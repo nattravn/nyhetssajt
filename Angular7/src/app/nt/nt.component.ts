@@ -9,6 +9,7 @@ import { CategoryService } from '../shared/category.service';
 })
 export class NtComponent implements OnInit {
 
+  order: string = 'pubDate';
   constructor(private ntService : NtService, private categoryService : CategoryService) { }
 
   ngOnInit() {

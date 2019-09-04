@@ -1,13 +1,13 @@
-<div *ngFor="let feed of categoryService.categoryList">
+<h2>{{categoryService.categoryList[0].category}}</h2>
+<div *ngFor="let feed of categoryService.categoryList | orderBy: order : true">
   <div class="col-md-10 blogShort">
       <h1>{{feed.title}}</h1>
       <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->
       <article>
-          <div [innerHTML]="feed.d"></div>
+          <div [innerHTML]="feed.description"></div>
       </article>
       <em>{{feed.pubDate}}</em>
       <br>
-      <a (click)="categoryService.populate(feed.Category)"  routerLink="/category">{{feed.category}}</a>
       <br>
       <a [href]="feed.link">Läs mer</a> 
   </div>

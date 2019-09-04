@@ -24,7 +24,7 @@ export class CategoryService {
         this.ntService.getNt().then((ntItem: Expressen[]) =>{
           this.customService.getCustom().then((customItem: Custom[]) =>{
 
-            ntItem.forEach(item =>{
+            ntItem.forEach(item =>{ 
               this.list.push(item)
             })
             svdItem.forEach(item =>{
@@ -46,6 +46,7 @@ export class CategoryService {
   
   // find the category in the general list that match the clicked one
   populate(category: string){
+    console.log("this.list: ", this.list);
     this.categoryList = new Array<Expressen>();
     this.list.forEach(item =>{
       if(item.category == category){

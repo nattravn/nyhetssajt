@@ -11,6 +11,7 @@ import { CategoryService } from '../shared/category.service';
 })
 export class CategoryComponent implements OnInit {
   public list: Expressen[];
+  order: string = 'pubDate';
   constructor(private expressenService: ExpressenService, 
               private ntService: NtService, 
               private svdService: SvdService,

@@ -6,6 +6,7 @@ let NtComponent = class NtComponent {
     constructor(ntService, categoryService) {
         this.ntService = ntService;
         this.categoryService = categoryService;
+        this.order = 'pubDate';
     }
     ngOnInit() {
     }
