@@ -19,8 +19,10 @@ import { Subject } from 'rxjs';
 export class HomeComponent implements OnInit {
 
   public globalList: Expressen[]= new Array<Expressen>();
+  searchTerm:string;
 
   isLoaded: boolean = false;
+
   loadingVisibilityChange: Subject<boolean> = new Subject<boolean>();
 
   constructor(private expressenService: ExpressenService, 
@@ -71,9 +73,9 @@ export class HomeComponent implements OnInit {
         })
       })
     })
+  }
 
-    
-
+  filterList(){
     
   }
 

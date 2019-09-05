@@ -19,4 +19,7 @@ export class AppComponent {
 
 
   constructor(private router: Router, private feed: Custom, private customService: CustomService, private http :  HttpClient ) { }
+
+  
+
 }

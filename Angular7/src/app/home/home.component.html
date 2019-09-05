@@ -1,7 +1,11 @@
-<div style="margin-bottom: 20px" *ngFor="let feed of globalList">
+<div class="form-group">
+  <input type="text" class="form-control" placeholder="Search by title" stye="width: 300px" [(ngModel)]=searchTerm>
+</div>
+
+
+<div style="margin-bottom: 20px" *ngFor="let feed of globalList | newsFilter:searchTerm">
     <div class="col-md-10 blogShort">
         <h1>{{feed.title}}</h1>
-        <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->
         <article>
             <div [innerHTML]="feed.description"></div>
         </article>

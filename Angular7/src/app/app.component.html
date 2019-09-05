@@ -9,7 +9,7 @@
     <div class="collapse navbar-collapse" id="navbarCollapse">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" routerLink="/expressen">Expressen</a>
+          <a class="nav-link" (click)="filterList('expressen')" >Expressen</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" routerLink="/nt">Nt</a>
@@ -20,11 +20,16 @@
         <li class="nav-item" *ngFor="let route of this.customService.customRoutes">
           <a class="nav-link" routerLink="/custom" [queryParams]="{ sourceParam: route}">{{route}} <span class="sr-only">(current)</span></a>
         </li>
+        
+      </ul>
+      <ul class="navbar-nav">
+        <li class="nav-item" >
+          <a class="nav-link" routerLink="/admin">Admin</a>
+        </li>
       </ul>
 
-      <a class="nav-link" routerLink="/admin">Admin</a>
       <form class="form-inline mt-2 mt-md-0">
-        <input class="form-control mr-sm-2" type="text" placeholder="Search" aria-label="Search">
+        <input class="form-control mr-sm-2" type="text" placeholder="Search by title" aria-label="Search" >
         <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
       </form>
     </div>
