@@ -1,9 +1,4 @@
-<div class="form-group">
-  <input type="text" class="form-control" placeholder="Search by title" stye="width: 300px" [(ngModel)]=searchTerm>
-</div>
-
-
-<div style="margin-bottom: 20px" *ngFor="let feed of globalList | newsFilter:searchTerm">
+<div style="margin-bottom: 20px" *ngFor="let feed of newsListService.globalList | newsFilter:newsListService.searchTerm">
     <div class="col-md-10 blogShort">
         <h1>{{feed.title}}</h1>
         <article>

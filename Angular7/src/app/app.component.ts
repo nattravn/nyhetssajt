@@ -5,6 +5,7 @@ import { CustomComponent } from './custom/custom.component';
 import { Custom } from './shared/custom.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { NewsListService } from './shared/news-list.service';
 
 @Component({
   selector: 'app-root',
@@ -18,7 +19,13 @@ export class AppComponent {
   public customFeeds$: Observable<Custom[]>
 
 
-  constructor(private router: Router, private feed: Custom, private customService: CustomService, private http :  HttpClient ) { }
+  constructor(
+    private router: Router, 
+    private feed: Custom, 
+    private customService: CustomService, 
+    private http :  HttpClient, 
+    private newsListService: NewsListService
+    ) { }
 
   
 

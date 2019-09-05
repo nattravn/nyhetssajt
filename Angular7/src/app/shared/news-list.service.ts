@@ -1,23 +1,19 @@
-import { Component, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { ExpressenService } from '../shared/expressen.service';
-import { Expressen } from '../shared/expressen.model';
-import { NtService } from '../shared/nt.service';
-import { SvdService } from '../shared/svd.service';
-import { Nt } from '../shared/nt.model';
-import { Svd } from '../shared/svd.model';
-import { CategoryService } from '../shared/category.service';
-import { CustomService } from '../shared/custom.service';
-import { Custom } from '../shared/custom.model';
+import { NtService } from './nt.service';
+import { SvdService } from './svd.service';
+import { CustomService } from './custom.service';
+import { CategoryService } from './category.service';
+import { Expressen } from './expressen.model';
+import { Svd } from './svd.model';
+import { Nt } from './nt.model';
+import { Custom } from './custom.model';
 import { Subject } from 'rxjs';
-import { NewsListService } from '../shared/news-list.service';
 
-
-@Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styles: []
+@Injectable({
+  providedIn: 'root'
 })
-export class HomeComponent implements OnInit {
+export class NewsListService {
 
   public globalList: Expressen[]= new Array<Expressen>();
   searchTerm:string;
@@ -30,17 +26,12 @@ export class HomeComponent implements OnInit {
               private ntService: NtService, 
               private svdService: SvdService,
               private customService: CustomService,
-              private categoryService: CategoryService,
-              private newsListService: NewsListService ){ 
-
-    this.newsListService.loadingVisibilityChange.subscribe((value) =>{
-      console.log("value: ", value);
-      this.isLoaded = value;
-    })
+              private categoryService: CategoryService) { 
+    this.initList();
   }
 
-  ngOnInit() {
 
+  initList(){
     this.expressenService.getExpressen().then((expressenItem: Expressen[]) =>{
       this.svdService.getSvd().then((svdItem: Svd[]) =>{
         this.ntService.getNt().then((ntItem: Nt[]) =>{
@@ -66,7 +57,7 @@ export class HomeComponent implements OnInit {
               this.globalList.push(item)
             });
 
-            //this.loadingVisibilityChange.next(true);
+            this.loadingVisibilityChange.next(true);
             console.log("this.list: ", this.globalList.length);
 
             this.globalList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
@@ -77,8 +68,9 @@ export class HomeComponent implements OnInit {
     })
   }
 
-  filterList(){
-    
+  filterList(source:string){
+    this.globalList = this.globalList.filter(item => 
+      item.source.toLocaleLowerCase().indexOf(source.toLocaleLowerCase()) != -1);
+    //this.searchTerm = source.toString();
   }
-
 }
