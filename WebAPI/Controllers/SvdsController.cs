@@ -40,7 +40,6 @@ namespace Nyhetssajt.Controllers
             {
                 return NotFound();
             }
-
             return svd;
         }
 
@@ -70,7 +69,6 @@ namespace Nyhetssajt.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
@@ -78,14 +76,12 @@ namespace Nyhetssajt.Controllers
         [HttpPost]
         public async Task<ActionResult<Svd>> PostSvd(Svd svd)
         {
-
             //Delete all the content in the table and RESEED id if the table contains more than 9 rows
 
             if (_context.Svds.Count() >= 10)
             {
                 _context.Database.ExecuteSqlCommand("DELETE FROM Svds DBCC CHECKIDENT('Svds', RESEED, 0)");
             }
-
 
             _context.Svds.Add(svd);
             await _context.SaveChangesAsync();

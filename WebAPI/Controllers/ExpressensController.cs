@@ -72,7 +72,6 @@ namespace Nyhetssajt.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
@@ -89,10 +88,6 @@ namespace Nyhetssajt.Controllers
             await _context.SaveChangesAsync();
 
             Debug.WriteLine("2. expressen.id: " + expressen.id);
-
-
-
-
             return CreatedAtAction("GetExpressen", new { id = expressen.id }, expressen);
         }
 
