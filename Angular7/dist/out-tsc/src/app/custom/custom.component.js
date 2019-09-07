@@ -12,10 +12,9 @@ let CustomComponent = class CustomComponent {
         this.isLoaded = false;
     }
     ngOnInit() {
-        console.log("isHidden: ", this.customService.isHidden);
+        // updating isLoaded value to remove the loading text i the view
         this.customService.loadingVisibilityChange.subscribe(value => {
             this.isLoaded = value;
-            console.log("value: ", value);
         });
     }
 };

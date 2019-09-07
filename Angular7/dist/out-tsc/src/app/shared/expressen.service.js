@@ -19,14 +19,14 @@ let ExpressenService = class ExpressenService {
         this.sourceName = "";
         this.rssUrl = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
         this.feeds = this.http.get(" https://api.rss2json.com/v1/api.json?rss_url=" + this.rssUrl);
-        this.feeds.subscribe(res => {
+        this.feeds.subscribe((res) => tslib_1.__awaiter(this, void 0, void 0, function* () {
             const fileType = _FileSaverService.genType("json");
             const txtBlob = new Blob([JSON.stringify(res)], { type: fileType });
             //_FileSaverService.save(txtBlob,"test.json");
             localStorage[CACHE_KEY] = JSON.stringify(res.items);
             this.sourceInfo = res.feed.description;
             this.sourceName = res.feed.title;
-            res.items.forEach(item => {
+            yield res.items.forEach(item => {
                 this.feed = new Expressen();
                 this.feed.category = item.categories.length > 0 ? item.categories[0] : null;
                 this.feed.pubDate = item.pubDate;
@@ -36,21 +36,31 @@ let ExpressenService = class ExpressenService {
                 this.feed.id = 0;
                 this.feed.title = item.title;
                 this.feed.source = "Expressen";
-                this.databaseList.push(this.feed);
+                this.unsortedList.push(this.feed);
             });
-            this.unsortedList.sort((a, b) => b.pubDate.localeCompare(a.pubDate));
+            console.log("this.unsortedList: ", this.unsortedList);
+            this.unsortedList.sort((a, b) => a.pubDate.localeCompare(b.pubDate));
             this.databaseList = this.unsortedList;
-            this.databaseList.forEach(item => {
-                /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned
-                /* and the item will be inserted on the first row instead */
-                this.postExpressen(item).subscribe(res => {
-                    console.log("Expressen feed inserted");
-                }, err => {
-                    console.log("Error: ", err);
-                    debugger;
+            console.log("this.databaseList: ", this.databaseList);
+            this.getExpressen().then(table => {
+                let rows = table;
+                if (rows.length > 10) {
+                    rows = rows.slice(rows.length - 11, rows.length - 1);
+                }
+                rows.forEach((row, index) => {
+                    console.log(row.title, " == ", this.databaseList[index].title);
+                    // if(this.databaseList[index].pubDate > row.pubDate){
+                    console.log("insert");
+                    this.postExpressen(this.databaseList[index]).subscribe((res) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                        yield console.log("Expressen feed inserted ", res.pubDate);
+                    }), err => {
+                        console.log("Error: ", err);
+                        debugger;
+                    });
+                    // }
                 });
             });
-        });
+        }));
         this.cacheList = this.feeds.pipe(map(data => data.items), startWith(JSON.parse(localStorage[CACHE_KEY] || '[]')));
     }
     postExpressen(feed) {

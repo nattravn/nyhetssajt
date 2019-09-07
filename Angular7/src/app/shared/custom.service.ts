@@ -17,8 +17,9 @@ interface Source {
 })
 export class CustomService {
 
-  list: Custom[]= [];
-  unsortedList: Custom[]= [];
+  downloadedList: Custom[]= [];
+  filteredDownloads: Custom[]= [];
+  unsortedDownloads: Custom[]= [];
   activeList: Custom[] = [];
   customRoutes :string[] = [];
   sources: Source[] = [];
@@ -45,7 +46,8 @@ export class CustomService {
     /*  we dont want to run this funtion twice */
     this.route.queryParams.subscribe(params => {
       console.log("setCustoms");
-      if(!this.done){
+      if(params.sourceParam){
+        this.unsortedDownloads = [];
         this.setCustoms(params.sourceParam);
         this.done = false;
       }
@@ -60,6 +62,7 @@ export class CustomService {
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+news.Rss).toPromise().then(res  =>{
       
       res.items.forEach((item, index )=> {
+        this.feed = new Custom();
         this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.pubDate = item.pubDate;
         this.feed.description =  item.description;
@@ -71,16 +74,14 @@ export class CustomService {
         this.feed.rss = news.Rss;
         this.feed.info = news.Info;
         
-        this.list.push(this.feed);
+        this.downloadedList.push(this.feed);
         
       });
 
-      // this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      // this.list = this.unsortedList;
       this.customRoutes.push(news.Source);
       this.adminSourceList.push(news);
 
-      this.list.forEach(item =>{
+      this.downloadedList.forEach(item =>{
         this.postCustom(item).subscribe(res => {
           console.log("Custom feed inserted");
         },
@@ -90,6 +91,8 @@ export class CustomService {
         })
       });
     })
+
+    this.downloadedList = [];
   }
 
   postCustom(feed : Expressen){
@@ -109,44 +112,93 @@ export class CustomService {
   }
 
   setCustoms(sourceParam: string){
-    this.getCustom().then(async rows =>{
-      let tabelRows = rows as Custom[];  
+    this.getCustom().then(async table =>{
+      let rows = table as Custom[];  
       //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
-      for (let dbRowIndex = 0; dbRowIndex < tabelRows.length; dbRowIndex+=10) {
+      console.log("start loop");
+      for (let dbRowIndex = 0; dbRowIndex < rows.length; dbRowIndex+=10) {
+
+        // empty the this array before we download more news from next source
+        //this.unsortedDownloads = [];
+
+        
         /* very important to wait on this get request because we update the active source outside this get request
         /* otherwise updateActiveSource will execute before anything has been pushed to this.sources and this.customRoutes */
-        await this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+tabelRows[dbRowIndex].rss).toPromise().then(rss  =>{
+        await this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+rows[dbRowIndex].rss).toPromise().then(rss  =>{
 
           rss.items.forEach( (rssItem, rssItemIndex )=> {
-
+            this.feed = new Custom();
             this.feed.category =  rssItem.categories.length > 0 ? rssItem.categories[0] : null ;
             this.feed.pubDate = rssItem.pubDate;
             this.feed.description =  rssItem.description;
             this.feed.link = rssItem.link;
             this.feed.ImageURL = rssItem.thumbnail;
-            this.feed.id = tabelRows[dbRowIndex+rssItemIndex].id;
+            this.feed.id = 0;
             this.feed.title = rssItem.title;
-            this.feed.source = tabelRows[dbRowIndex].source;
-            this.feed.rss = tabelRows[dbRowIndex].rss;
-            this.feed.info = tabelRows[dbRowIndex].info;
+            this.feed.source = rows[dbRowIndex].source;
+            this.feed.rss = rows[dbRowIndex].rss;
+            this.feed.info = rows[dbRowIndex].info;
 
-            this.updateCustom(this.feed);
+            this.unsortedDownloads.push(this.feed);
             
           });
 
+          this.unsortedDownloads.sort((a,b) => a.pubDate.localeCompare(b.pubDate)); 
+          let sortedList = this.unsortedDownloads;
+          console.log("sortedList: ", sortedList);
+          console.log("sourceParam: ", sourceParam);
+          
+          // pick all the rows from the table that match the clicked source
+          let filteredRows = rows.filter(item => item.source === sourceParam);
+          /* we are looping through the entire table, but we have clicked on a source
+          /* then we need to pick just the rows with the matching source*/
+          //console.log()
+          this.filteredDownloads = sortedList.filter(item => item.source === sourceParam);
+
+          /* records are inserted "randomly" in the tabel and also returnd randomly, 
+          /* we must sort it to get the earliest date first in the list */
+          filteredRows.sort((a,b) => a.pubDate.localeCompare(b.pubDate)); 
+
+          // we only want to compare the 10 last rows
+          if(filteredRows.length > 10){
+            filteredRows = filteredRows.slice(filteredRows.length-11,filteredRows.length-1);
+          }
+          console.log("filteredRows: ", filteredRows);
+          console.log("filteredDownloads: ", this.filteredDownloads);
+          if(filteredRows.length > 0){
+            this.filteredDownloads.forEach(async (dowloadedFeed, index) =>{
+              // post only if the downloaded feed is newer than the feed in the table
+              if(dowloadedFeed.pubDate > filteredRows[index].pubDate){
+                console.log(dowloadedFeed.pubDate ," > ", filteredRows[index].pubDate);
+                this.postCustom(dowloadedFeed).subscribe((res : Expressen) => {
+                  console.log("Expressen feed inserted ", res.pubDate);
+                },
+                err =>{
+                  console.log("Error: ", err);
+                  debugger;
+                })
+              }
+            })
+          }
+          console.log("add source info: ", this.customRoutes.indexOf(rows[dbRowIndex].source) === -1);
           // add source-info and source-routes
-          if(this.customRoutes.indexOf(tabelRows[dbRowIndex].source) === -1){
-            this.sources.push({"sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": tabelRows[dbRowIndex].source});
-            this.customRoutes.push(tabelRows[dbRowIndex].source);
-            this.adminSourceList.push(tabelRows[dbRowIndex]);
+          this.sources.push({"sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": rows[dbRowIndex].source});
+          this.loadingVisibilityChange.next(true);
+          if(this.customRoutes.indexOf(rows[dbRowIndex].source) === -1){
+            this.sources.push({"sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": rows[dbRowIndex].source});
+           // this.customRoutes.push(rows[dbRowIndex].source);
+           // this.adminSourceList.push(rows[dbRowIndex]);
 
             // from here is all data loaded and we want to remove the loadning text by setting the isLoaded variable to true
             this.loadingVisibilityChange.next(true);
           }
+          
         });
+        
+        
       }
       
-      this.list = tabelRows;
+      //this.list = rows;
       this.updateActiveSource(sourceParam);
       
     })
@@ -157,7 +209,9 @@ export class CustomService {
     this.activeList = [];
     this.activeRoute = route;
 
-    this.list.forEach(item=> {
+    console.log("this.filteredDownloads: ", this.filteredDownloads);
+    // probably not the fastest method
+    this.filteredDownloads.forEach(item=> {
       if(item.source == route){
         this.activeList.push(item);
       }

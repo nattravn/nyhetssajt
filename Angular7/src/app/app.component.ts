@@ -25,7 +25,22 @@ export class AppComponent {
     private customService: CustomService, 
     private http :  HttpClient, 
     private newsListService: NewsListService
-    ) { }
+    ) { 
+
+      customService.getCustom().then(table =>{
+        let rows = table as Custom[];  
+        //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
+        console.log("start loop");
+        for (let dbRowIndex = 0; dbRowIndex < rows.length; dbRowIndex+=10) {
+          customService.customRoutes.push(rows[dbRowIndex].source);
+          customService.adminSourceList.push(rows[dbRowIndex]);
+          
+        
+        }
+        
+      })
+      
+    }
 
   
 

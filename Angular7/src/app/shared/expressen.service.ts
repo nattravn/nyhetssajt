@@ -5,6 +5,7 @@ import { Expressen } from './expressen.model';
 import { FileSaverService } from 'ngx-filesaver';
 import { Observable, bindNodeCallback } from 'rxjs';
 import { map, tap, startWith } from 'rxjs/operators';
+import { async } from 'q';
 // import { parseString, parseFile, parseURL, RSSParsed } from 'rss-parser';
 
 
@@ -19,7 +20,7 @@ export class ExpressenService {
   readonly rootURL = "http://localhost:44380/api";
   cacheList: Expressen[] = [];
   unsortedList: Expressen[] = [];
-  databaseList: Expressen[]  = [];
+  sortedList: Expressen[]  = [];
   feed: Expressen;
 
   sourceInfo:string = "";
@@ -31,9 +32,7 @@ export class ExpressenService {
 
   constructor(private http: HttpClient, private _FileSaverService: FileSaverService) { 
     
-    this.feeds = this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl)
-
-    this.feeds.subscribe(res =>{
+    this.feeds = this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res =>{
 
       const fileType = _FileSaverService.genType("json");
       const txtBlob = new Blob([JSON.stringify(res)], { type: fileType });
@@ -52,29 +51,44 @@ export class ExpressenService {
         this.feed.title = item.title;
         this.feed.source = "Expressen";
 
-        this.databaseList.push(this.feed);
+        this.unsortedList.push(this.feed);
 
       });
-      this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      this.databaseList = this.unsortedList;
+      this.unsortedList.sort((a,b) => a.pubDate.localeCompare(b.pubDate)); 
+      this.sortedList = this.unsortedList;
 
-      this.databaseList.forEach(item =>{
-        /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned 
-        /* and the item will be inserted on the first row instead */
-        this.postExpressen(item).subscribe(res => {
-          console.log("Expressen feed inserted");
-        },
-        err =>{
-          console.log("Error: ", err);
-          debugger;
+      this.getExpressen().then(table =>{
+        let rows = table as Expressen[];
+
+        // we only want to compare the 10 last rows
+        if(rows.length > 10){
+          rows = rows.slice(rows.length-11,rows.length-1);
+        }
+
+        /* records are inserted "randomly" in the tabel and also returnd randomly, 
+        /* we must sort it to get the earliest date first in the list */
+        rows.sort((a,b) => a.pubDate.localeCompare(b.pubDate));
+
+        this.sortedList.forEach(async (dowloadedFeed, index) =>{
+          // post only if the downloaded feed is newer than the feed in the table
+          if(dowloadedFeed.pubDate > rows[index].pubDate){
+
+            this.postExpressen(this.sortedList[index]).subscribe((res : Expressen) => {
+              console.log("Expressen feed inserted ", res.pubDate);
+            },
+            err =>{
+              console.log("Error: ", err);
+              debugger;
+            })
+          }
         })
       })
     })
 
-    this.cacheList = this.feeds.pipe(
-      map<any, any>(data => data.items),
-      startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
-    )
+    // this.cacheList = this.feeds.pipe(
+    //   map<any, any>(data => data.items),
+    //   startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
+    // )
     
   }
 

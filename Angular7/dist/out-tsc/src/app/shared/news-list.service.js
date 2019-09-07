@@ -1,29 +1,24 @@
 import * as tslib_1 from "tslib";
-import { Component } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { ExpressenService } from '../shared/expressen.service';
-import { NtService } from '../shared/nt.service';
-import { SvdService } from '../shared/svd.service';
-import { CategoryService } from '../shared/category.service';
-import { CustomService } from '../shared/custom.service';
+import { NtService } from './nt.service';
+import { SvdService } from './svd.service';
+import { CustomService } from './custom.service';
+import { CategoryService } from './category.service';
 import { Subject } from 'rxjs';
-import { NewsListService } from '../shared/news-list.service';
-let HomeComponent = class HomeComponent {
-    constructor(expressenService, ntService, svdService, customService, categoryService, newsListService) {
+let NewsListService = class NewsListService {
+    constructor(expressenService, ntService, svdService, customService, categoryService) {
         this.expressenService = expressenService;
         this.ntService = ntService;
         this.svdService = svdService;
         this.customService = customService;
         this.categoryService = categoryService;
-        this.newsListService = newsListService;
         this.globalList = new Array();
         this.isLoaded = false;
         this.loadingVisibilityChange = new Subject();
-        this.newsListService.loadingVisibilityChange.subscribe((value) => {
-            console.log("value: ", value);
-            this.isLoaded = value;
-        });
+        this.initList();
     }
-    ngOnInit() {
+    initList() {
         this.expressenService.getExpressen().then((expressenItem) => {
             this.svdService.getSvd().then((svdItem) => {
                 this.ntService.getNt().then((ntItem) => {
@@ -47,7 +42,7 @@ let HomeComponent = class HomeComponent {
                             console.log("item.Source: ", item.source);
                             this.globalList.push(item);
                         });
-                        //this.loadingVisibilityChange.next(true);
+                        this.loadingVisibilityChange.next(true);
                         console.log("this.list: ", this.globalList.length);
                         this.globalList.sort((a, b) => b.pubDate.localeCompare(a.pubDate));
                         this.globalList = this.globalList.slice(0, 10);
@@ -56,21 +51,20 @@ let HomeComponent = class HomeComponent {
             });
         });
     }
-    filterList() {
+    filterList(source) {
+        this.globalList = this.globalList.filter(item => item.source.toLocaleLowerCase().indexOf(source.toLocaleLowerCase()) != -1);
+        //this.searchTerm = source.toString();
     }
 };
-HomeComponent = tslib_1.__decorate([
-    Component({
-        selector: 'app-home',
-        templateUrl: './home.component.html',
-        styles: []
+NewsListService = tslib_1.__decorate([
+    Injectable({
+        providedIn: 'root'
     }),
     tslib_1.__metadata("design:paramtypes", [ExpressenService,
         NtService,
         SvdService,
         CustomService,
-        CategoryService,
-        NewsListService])
-], HomeComponent);
-export { HomeComponent };
-//# sourceMappingURL=home.component.js.map
+        CategoryService])
+], NewsListService);
+export { NewsListService };
+//# sourceMappingURL=news-list.service.js.map

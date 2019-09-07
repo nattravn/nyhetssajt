@@ -19,7 +19,7 @@ let CustomService = class CustomService {
         this.activeSourceInfo = "";
         this.activeSourceName = "";
         this.done = false;
-        this.isHidden = false;
+        this.isLoaded = false;
         this.loadingVisibilityChange = new Subject();
         this.form = new FormGroup({
             Source: new FormControl(""),
@@ -37,7 +37,7 @@ let CustomService = class CustomService {
             }
         });
         this.loadingVisibilityChange.subscribe((value) => {
-            this.isHidden = value;
+            this.isLoaded = value;
         });
     }
     insertCustom(news) {
@@ -60,12 +60,13 @@ let CustomService = class CustomService {
             this.customRoutes.push(news.Source);
             this.adminSourceList.push(news);
             this.list.forEach(item => {
-                this.postCustom(item).subscribe(res => {
-                    console.log("Custom feed inserted");
-                }, err => {
-                    console.log("Error: ", err);
-                    debugger;
-                });
+                // this.postCustom(item).subscribe(res => {
+                //   console.log("Custom feed inserted");
+                // },
+                // err =>{
+                //   console.log("Error: ", err);
+                //   debugger;
+                // })
             });
         });
     }
@@ -107,6 +108,7 @@ let CustomService = class CustomService {
                         this.sources.push({ "sourceInfo": rss.feed.description, "sourceName": rss.feed.title, "source": tabelRows[dbRowIndex].source });
                         this.customRoutes.push(tabelRows[dbRowIndex].source);
                         this.adminSourceList.push(tabelRows[dbRowIndex]);
+                        // from here is all data loaded and we want to remove the loadning text by setting the isLoaded variable to true
                         this.loadingVisibilityChange.next(true);
                     }
                 });
@@ -119,6 +121,7 @@ let CustomService = class CustomService {
         //important to empty the active list every time a new source is clicked
         this.activeList = [];
         this.activeRoute = route;
+        // probably not the fastest method
         this.list.forEach(item => {
             if (item.source == route) {
                 this.activeList.push(item);

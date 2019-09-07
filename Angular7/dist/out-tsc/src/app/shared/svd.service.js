@@ -32,12 +32,13 @@ let SvdService = class SvdService {
             this.list.forEach(item => {
                 /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned
                 /* and the item will be inserted on the first row instead */
-                this.postSvd(item).subscribe(res => {
-                    console.log("Svd feed inserted");
-                }, err => {
-                    console.log("Error: ", err);
-                    debugger;
-                });
+                // this.postSvd(item).subscribe(res => {
+                //   console.log("Svd feed inserted");
+                // },
+                // err =>{
+                //   console.log("Error: ", err);
+                //   debugger;
+                // })
             });
         });
     }

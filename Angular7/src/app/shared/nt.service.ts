@@ -38,20 +38,20 @@ export class NtService {
         this.list.push(this.feed);
       });
 
-      // this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      // this.list = this.unsortedList;
+      this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+      this.list = this.unsortedList;
 
       // Store it in the database
       this.list.forEach(item =>{
         /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned 
         /* and the item will be inserted on the first row instead */
-        this.postNt(item).subscribe(res => {
-          console.log("Nt feed inserted");
-        },
-        err =>{
-          console.log("Error: ", err);
-          debugger;
-        })
+        // this.postNt(item).subscribe(res => {
+        //   console.log("Nt feed inserted");
+        // },
+        // err =>{
+        //   console.log("Error: ", err);
+        //   debugger;
+        // })
       })
     })
   }
