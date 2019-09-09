@@ -76,10 +76,10 @@ namespace Nyhetssajt.Controllers
         [HttpPost]
         public async Task<ActionResult<Nt>> PostNt(Nt nt)
         {
-            if (_context.Nts.Count() >= 10)
-            {
-                _context.Database.ExecuteSqlCommand("DELETE FROM Nts DBCC CHECKIDENT('Nts', RESEED, 0)");
-            }
+            //if (_context.Nts.Count() >= 10)
+            //{
+            //    _context.Database.ExecuteSqlCommand("DELETE FROM Nts DBCC CHECKIDENT('Nts', RESEED, 0)");
+            //}
 
             _context.Nts.Add(nt);
             await _context.SaveChangesAsync();

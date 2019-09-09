@@ -75,6 +75,14 @@ namespace Nyhetssajt.Controllers
             return NoContent();
         }
 
+        [HttpGet("source/{source}")]
+        public async Task<ActionResult<IEnumerable<Custom>>> GetCustomBySource(string source)
+        {
+
+
+            return await _context.Customs.Where(b => b.source == source).ToListAsync();
+        }
+
         // POST: api/Customs
         [HttpPost]
         public async Task<ActionResult<Custom>> PostCustom(Custom custom)
@@ -144,8 +152,7 @@ namespace Nyhetssajt.Controllers
 
             _context.SaveChanges();
 
-            Custom cc = new Custom();
-            return cc;
+            return custom;
         }
 
         private bool CustomExists(int id)

@@ -28,7 +28,8 @@ namespace Nyhetssajt.Controllers
         public async Task<ActionResult<IEnumerable<Expressen>>> GetExpressens()
         {
             Debug.WriteLine("get feeds");
-            return await _context.Expressens.ToListAsync();
+            var mostUsedNews = _context.Expressens.OrderByDescending(t => t.pubDate).Take(10);
+            return await mostUsedNews.ToListAsync();
         }
 
         // GET: api/Expressens/5
@@ -79,15 +80,16 @@ namespace Nyhetssajt.Controllers
         [HttpPost]
         public async Task<ActionResult<Expressen>> PostExpressen(Expressen expressen)
         {
-            if (_context.Expressens.Count() >= 10)
-            {
-                _context.Database.ExecuteSqlCommand("DELETE FROM Expressens DBCC CHECKIDENT('Expressens', RESEED, 0)");
-            }
+            //if (_context.Expressens.Count() >= 10)
+            //{
+            //    _context.Database.ExecuteSqlCommand("DELETE FROM Expressens DBCC CHECKIDENT('Expressens', RESEED, 0)");
+            //}
 
-            _context.Expressens.Add(expressen);
+             _context.Expressens.Add(expressen);
+
             await _context.SaveChangesAsync();
 
-            Debug.WriteLine("2. expressen.id: " + expressen.id);
+            Debug.WriteLine("inserted date " + expressen.pubDate);
             return CreatedAtAction("GetExpressen", new { id = expressen.id }, expressen);
         }
 

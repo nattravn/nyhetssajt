@@ -44,6 +44,9 @@ namespace Nyhetssajt
             services.AddDbContext<CustomContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
 
+            services.AddDbContext<SourceContext>(options =>
+            options.UseSqlServer(Configuration.GetConnectionString("DevConnection")));
+
             services.AddCors();
             //disable .net cores auto camelcaseing for the response keys. We want the front-end model to be equal to the backend-model
             services.AddMvc()
