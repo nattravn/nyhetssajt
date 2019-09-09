@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Expressen } from './expressen.model';
 import { FileSaverService } from 'ngx-filesaver';
-import { map, startWith } from 'rxjs/operators';
 // import { parseString, parseFile, parseURL, RSSParsed } from 'rss-parser';
 //https://github.com/ardatan/angular-rss-reader/blob/master/src/app/rss-feed.component.ts
 const CACHE_KEY = "httpRssCache";
@@ -14,19 +13,18 @@ let ExpressenService = class ExpressenService {
         this.rootURL = "http://localhost:44380/api";
         this.cacheList = [];
         this.unsortedList = [];
-        this.databaseList = [];
+        this.sortedList = [];
         this.sourceInfo = "";
         this.sourceName = "";
         this.rssUrl = "http://www.expressen.se/Pages/OutboundFeedsPage.aspx?id=3642159&viewstyle=rss";
-        this.feeds = this.http.get(" https://api.rss2json.com/v1/api.json?rss_url=" + this.rssUrl);
-        this.feeds.subscribe((res) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+        this.feeds = this.http.get(" https://api.rss2json.com/v1/api.json?rss_url=" + this.rssUrl).toPromise().then(res => {
             const fileType = _FileSaverService.genType("json");
             const txtBlob = new Blob([JSON.stringify(res)], { type: fileType });
             //_FileSaverService.save(txtBlob,"test.json");
             localStorage[CACHE_KEY] = JSON.stringify(res.items);
             this.sourceInfo = res.feed.description;
             this.sourceName = res.feed.title;
-            yield res.items.forEach(item => {
+            res.items.forEach(item => {
                 this.feed = new Expressen();
                 this.feed.category = item.categories.length > 0 ? item.categories[0] : null;
                 this.feed.pubDate = item.pubDate;
@@ -38,30 +36,34 @@ let ExpressenService = class ExpressenService {
                 this.feed.source = "Expressen";
                 this.unsortedList.push(this.feed);
             });
-            console.log("this.unsortedList: ", this.unsortedList);
             this.unsortedList.sort((a, b) => a.pubDate.localeCompare(b.pubDate));
-            this.databaseList = this.unsortedList;
-            console.log("this.databaseList: ", this.databaseList);
+            this.sortedList = this.unsortedList;
             this.getExpressen().then(table => {
                 let rows = table;
+                // we only want to compare the 10 last rows
                 if (rows.length > 10) {
                     rows = rows.slice(rows.length - 11, rows.length - 1);
                 }
-                rows.forEach((row, index) => {
-                    console.log(row.title, " == ", this.databaseList[index].title);
-                    // if(this.databaseList[index].pubDate > row.pubDate){
-                    console.log("insert");
-                    this.postExpressen(this.databaseList[index]).subscribe((res) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        yield console.log("Expressen feed inserted ", res.pubDate);
-                    }), err => {
-                        console.log("Error: ", err);
-                        debugger;
-                    });
-                    // }
-                });
+                /* records are inserted "randomly" in the tabel and also returnd randomly,
+                /* we must sort it to get the earliest date first in the list */
+                rows.sort((a, b) => a.pubDate.localeCompare(b.pubDate));
+                this.sortedList.forEach((dowloadedFeed, index) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                    // post only if the downloaded feed is newer than the feed in the table
+                    if (dowloadedFeed.pubDate > rows[index].pubDate) {
+                        this.postExpressen(this.sortedList[index]).subscribe((res) => {
+                            console.log("Expressen feed inserted ", res.pubDate);
+                        }, err => {
+                            console.log("Error: ", err);
+                            debugger;
+                        });
+                    }
+                }));
             });
-        }));
-        this.cacheList = this.feeds.pipe(map(data => data.items), startWith(JSON.parse(localStorage[CACHE_KEY] || '[]')));
+        });
+        // this.cacheList = this.feeds.pipe(
+        //   map<any, any>(data => data.items),
+        //   startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
+        // )
     }
     postExpressen(feed) {
         return this.http.post(this.rootURL + "/Expressens", feed);

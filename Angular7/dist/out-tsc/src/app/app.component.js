@@ -13,6 +13,16 @@ let AppComponent = class AppComponent {
         this.http = http;
         this.newsListService = newsListService;
         this.title = 'nyhetssajt-app';
+        customService.getCustom().then(table => {
+            let rows = table;
+            //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
+            for (let dbRowIndex = 0; dbRowIndex < rows.length; dbRowIndex += 10) {
+                if (customService.customRoutes.indexOf(rows[dbRowIndex].source) === -1) {
+                    customService.customRoutes.push(rows[dbRowIndex].source);
+                    customService.adminSourceList.push(rows[dbRowIndex]);
+                }
+            }
+        });
     }
 };
 AppComponent = tslib_1.__decorate([

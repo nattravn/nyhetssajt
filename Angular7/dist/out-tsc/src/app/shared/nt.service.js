@@ -28,8 +28,8 @@ let NtService = class NtService {
                 this.feed.source = "Nt";
                 this.list.push(this.feed);
             });
-            // this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-            // this.list = this.unsortedList;
+            this.unsortedList.sort((a, b) => b.pubDate.localeCompare(a.pubDate));
+            this.list = this.unsortedList;
             // Store it in the database
             this.list.forEach(item => {
                 /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned

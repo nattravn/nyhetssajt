@@ -6,6 +6,8 @@ import { Custom } from './shared/custom.model';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { NewsListService } from './shared/news-list.service';
+import { SourceService } from './shared/source.service';
+import { Source } from './shared/source.model';
 
 @Component({
   selector: 'app-root',
@@ -22,23 +24,23 @@ export class AppComponent {
   constructor(
     private router: Router, 
     private feed: Custom, 
-    private customService: CustomService, 
+    private sourceService: SourceService,
+    private customService: CustomService,  
     private http :  HttpClient, 
     private newsListService: NewsListService
     ) { 
 
-      customService.getCustom().then(table =>{
-        let rows = table as Custom[];  
+      this.sourceService.getSources().then(table =>{
+        let rows = table as Source[];  
         //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
-        console.log("start loop");
-        for (let dbRowIndex = 0; dbRowIndex < rows.length; dbRowIndex+=10) {
-          customService.customRoutes.push(rows[dbRowIndex].source);
-          customService.adminSourceList.push(rows[dbRowIndex]);
-          
-        
-        }
-        
-      })
+        rows.forEach(source =>{
+          if(customService.customRoutes.indexOf(source.name) === -1){
+            customService.customRoutes.push(source.name);
+            customService.adminSourceList.push(source);
+          }  
+        })
+      });
+            
       
     }
 
