@@ -8,10 +8,6 @@
           <mat-error>This field is mandatory.</mat-error>
         </mat-form-field>
         <mat-form-field>
-          <input formControlName="Info" matInput placeholder="Info">
-          <mat-error>Invalid email address.</mat-error>
-        </mat-form-field>
-        <mat-form-field>
           <input formControlName="Rss" matInput placeholder="Rss">
         </mat-form-field>
         <div class="button-row">
@@ -31,8 +27,7 @@
                 <td (click)="remove(source)">{{source.rss}}</td>
                 <td (click)="remove(source)">{{source.info}}</td>
                 <td>
-                    <a class="btn btn-sm btn-info text-white" (click)="deleteSource(source)"><i class="fa fa-trash"></i></a>
-                 
+                  <a class="btn btn-sm btn-info text-white" (click)="deleteSource(source)"><i class="fa fa-trash"></i></a>
                 </td>
               </tr>
             </table>

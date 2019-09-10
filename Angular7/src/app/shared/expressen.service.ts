@@ -32,8 +32,9 @@ export class ExpressenService {
 
   constructor(private http: HttpClient, private _FileSaverService: FileSaverService) { 
     
-    this.feeds = this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res =>{
+    this.feeds = this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl);
 
+    this.feeds.subscribe(res=>{
       const fileType = _FileSaverService.genType("json");
       const txtBlob = new Blob([JSON.stringify(res)], { type: fileType });
       //_FileSaverService.save(txtBlob,"test.json");
@@ -62,7 +63,7 @@ export class ExpressenService {
 
         // we only want to compare the 10 last rows
         if(rows.length > 10){
-          rows = rows.slice(rows.length-11,rows.length-1);
+          rows = rows.slice(rows.length-10,rows.length);
         }
 
         /* records are inserted "randomly" in the tabel and also returnd randomly, 
@@ -85,10 +86,10 @@ export class ExpressenService {
       })
     })
 
-    // this.cacheList = this.feeds.pipe(
-    //   map<any, any>(data => data.items),
-    //   startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
-    // )
+    this.cacheList = this.feeds.pipe(
+      map<any, any>(data => data.items),
+      startWith(JSON.parse(localStorage[CACHE_KEY] || '[]'))
+    )
     
   }
 

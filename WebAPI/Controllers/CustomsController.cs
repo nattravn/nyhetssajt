@@ -95,31 +95,19 @@ namespace Nyhetssajt.Controllers
         }
 
         // DELETE: api/Customs/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Custom>> DeleteCustom(int id)
+        [HttpDelete("{name}")]
+        public int DeleteCustom(string name)
         {
-            Debug.WriteLine("Delete id outside: " + id);
 
-            var custom = await _context.Customs.FindAsync(id);
-            _context.Customs.Remove(custom);
-            await _context.SaveChangesAsync();
+            var deletedRecords = new List<Custom>();
 
-            for (int i = 1; i < 10; i++)
-            {
+            int count = 0;
+            Debug.WriteLine("name: " + name);
+            count =_context.Customs.Where(b => b.source.ToLower() == name.ToLower()).ToList().Count();
+            _context.Customs.RemoveRange(_context.Customs.Where(b => b.source.ToLower() == name.ToLower()));
+            _context.SaveChanges();
 
-                
-                custom = await _context.Customs.FindAsync(id + i);
-                if (custom == null)
-                {
-                    return NotFound();
-                }
 
-                _context.Customs.Remove(custom);
-                await _context.SaveChangesAsync();
-                Debug.WriteLine("Delete id: " + (id + i));
-
-            }
-            
             //List<Custom> l = _context.Customs.ToList();
 
             //int n = _context.Customs.Count();
@@ -150,9 +138,8 @@ namespace Nyhetssajt.Controllers
             //    _context.Customs.Add(c);
             //});
 
-            _context.SaveChanges();
 
-            return custom;
+            return count;
         }
 
         private bool CustomExists(int id)

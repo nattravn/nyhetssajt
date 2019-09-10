@@ -41,7 +41,6 @@ export class CustomService {
 
   form: FormGroup = new FormGroup({
     Source: new FormControl(""),
-    Info: new FormControl(""),
     Rss: new FormControl("")
   })
   
@@ -69,7 +68,7 @@ export class CustomService {
 
   insertCustom(news){
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+news.Rss).toPromise().then(res  =>{
-      
+
       res.items.forEach((item, index )=> {
         this.feed = new Custom();
         this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
@@ -81,14 +80,10 @@ export class CustomService {
         this.feed.title = item.title;
         this.feed.source = news.Source;
         this.feed.rss = news.Rss;
-        this.feed.info = news.Info;
+        this.feed.info = res.feed.description;
         
         this.downloadedList.push(this.feed);
-        
       });
-
-      this.customRoutes.push(news.Source);
-      this.adminSourceList.push(news);
 
       this.downloadedList.forEach(item =>{
         this.postCustom(item).subscribe(res => {
@@ -99,6 +94,24 @@ export class CustomService {
           debugger;
         })
       });
+
+      let newSource = new Source();
+      newSource.id = 0;
+      newSource.name = news.Source;
+      newSource.rss = news.Rss;
+      newSource.info = res.feed.description;
+      newSource.title = res.feed.title;
+
+      this.customRoutes.push(news.Source);
+      this.adminSourceList.push(newSource);
+
+      this.sourceService.postSource(newSource).subscribe(res => {
+        console.log("Source inserted");
+      },
+      err =>{
+        console.log("Error: ", err);
+        debugger;
+      })
     })
 
     this.downloadedList = [];
@@ -120,16 +133,23 @@ export class CustomService {
     return this.http.put(this.rootURL+"/Customs/" + feed.id, feed).toPromise();
   }
 
-  deleteCustom(id : number){
-    return this.http.delete(this.rootURL+"/Customs/" + id);
+  deleteCustom(name : string){
+    let index = this.adminSourceList.findIndex(item=>item.name == name)
+    if (index > -1) {
+      this.adminSourceList.splice(index, 1);
+    }
+
+    index = this.customRoutes.findIndex(item=>item == name)
+    if (index > -1) {
+      this.customRoutes.splice(index, 1);
+    }
+    return this.http.delete(this.rootURL+"/Customs/" + name);
   }
 
   async setCustoms(clickedSource: Source){
 
     this.activeSourceInfo = clickedSource.info;
     this.activeSourceName = clickedSource.title;
-    //looping through every 10th tabel row, use the source from the row, download the rss feed and update the rows  
-       
 
     /* very important to wait on this get request because we update the active source outside this get request
     /* otherwise updateActiveSource will execute before anything has been pushed to this.sources and this.customRoutes */
@@ -164,7 +184,6 @@ export class CustomService {
           sortedRows = sortedRows.slice(sortedRows.length-10,sortedRows.length);
         }
 
-
         this.sortedDownloads.forEach(async (dowloadedFeed, index) =>{
           // post only if the downloaded feed is newer than the feed in the table
           if(dowloadedFeed.pubDate > sortedRows[index].pubDate){
@@ -180,13 +199,11 @@ export class CustomService {
         })
       })
       
+      // from here is all data loaded and we want to remove the loadning text by setting the isLoaded variable to true
       this.loadingVisibilityChange.next(true);
       if(this.customRoutes.indexOf(clickedSource.name) === -1){
         this.customRoutes.push(clickedSource.name);
         this.adminSourceList.push(clickedSource);
-
-        // from here is all data loaded and we want to remove the loadning text by setting the isLoaded variable to true
-        this.loadingVisibilityChange.next(true);
       }
       
     });

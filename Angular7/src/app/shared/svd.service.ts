@@ -11,7 +11,7 @@ export class SvdService {
   readonly rootURL = "http://localhost:44380/api";
   readonly rssUrl: string = "https://www.svd.se/?service=rss";
 
-  list: Svd[] = []
+  sortedList: Svd[] = []
   unsortedList: Svd[] = [];
   feed: Svd ;
 
@@ -19,7 +19,7 @@ export class SvdService {
   sourceName: string = "";
 
   constructor(private http: HttpClient, private feed2: Svd) { 
-    
+    this.unsortedList=[];
     this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
 
       this.sourceInfo = res.feed.description;
@@ -36,22 +36,37 @@ export class SvdService {
         this.feed.title = item.title;
         this.feed.source = "Svd";
 
-        this.list.push(this.feed);
+        this.unsortedList.push(this.feed);
 
       });
-      // this.unsortedList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
-      // this.list = this.unsortedList;
+      this.unsortedList.sort((a,b) => a.pubDate.localeCompare(b.pubDate)); 
+      this.sortedList = this.unsortedList;
 
-      this.list.forEach(item =>{
-        /* The table will only hold 10 items. When the 11th item tries to be inserted the table will be cleaned 
-        /* and the item will be inserted on the first row instead */
-        // this.postSvd(item).subscribe(res => {
-        //   console.log("Svd feed inserted");
-        // },
-        // err =>{
-        //   console.log("Error: ", err);
-        //   debugger;
-        // })
+      this.getSvd().then(table =>{
+        let rows = table as Svd[];
+
+        // we only want to compare the 10 last rows
+        if(rows.length > 10){
+          rows = rows.slice(rows.length-10,rows.length);
+        }
+
+        /* records are inserted "randomly" in the tabel and also returnd randomly, 
+        /* we must sort it to get the earliest date first in the list */
+        rows.sort((a,b) => a.pubDate.localeCompare(b.pubDate));
+
+        this.sortedList.forEach(async (dowloadedFeed, index) =>{
+          // post only if the downloaded feed is newer than the feed in the table
+          if(dowloadedFeed.pubDate > rows[index].pubDate){
+
+            this.postSvd(this.sortedList[index]).subscribe((res : Svd) => {
+              console.log("Expressen feed inserted ", res.pubDate);
+            },
+            err =>{
+              console.log("Error: ", err);
+              debugger;
+            })
+          }
+        })
       })
     })
   }

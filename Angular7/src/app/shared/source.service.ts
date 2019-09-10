@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Source } from './source.model';
 
 @Injectable({
   providedIn: 'root'
@@ -18,5 +19,9 @@ export class SourceService {
 
   deleteSource(id: number){
     return this.http.delete(this.rootURL+"/Sources/" + id);
+  }
+
+  postSource(source: Source){
+    return this.http.post(this.rootURL+"/Sources", source);
   }
 }
