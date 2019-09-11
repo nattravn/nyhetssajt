@@ -3,7 +3,7 @@
 <div *ngFor="let feed of customService.activeList | orderBy: order : true | newsFilter:newsListService.searchTerm">
     <div class="col-md-10 blogShort">
         <h1>{{feed.title}}</h1>
-        <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->
+        <!-- <img [src]="feed.ImageURL" alt="post img" height="150" width="200" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->
         <article>
             <div [innerHTML]="feed.description"></div>
         </article>

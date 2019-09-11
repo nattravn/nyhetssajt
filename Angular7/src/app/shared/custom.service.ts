@@ -57,7 +57,6 @@ export class CustomService {
           this.adminSourceList.push(source);
         }
       })
-      
     })
   }
 
@@ -110,7 +109,6 @@ export class CustomService {
       this.customRoutes.push(news.Source);
       this.adminSourceList.push(newSource);
     })
-
     this.downloadedList = [];
   }
 
@@ -127,11 +125,21 @@ export class CustomService {
 
       rss.items.forEach( rssItem => {
         let feed = new Custom();
+
+        // all feeds does not add the image into the "description"
+        let imageUrl = "";
+        if(clickedSource.name == "Dn"){
+          imageUrl = rssItem.enclosure.link;
+        }
+        else{
+          imageUrl = rssItem.thumbnail;
+        }
+
         feed.category =  rssItem.categories.length > 0 ? rssItem.categories[0] : null ;
         feed.pubDate = rssItem.pubDate;
         feed.description =  rssItem.description;
         feed.link = rssItem.link;
-        feed.ImageURL = rssItem.thumbnail;
+        feed.ImageURL = imageUrl
         feed.id = 0;
         feed.title = rssItem.title;
         feed.source = clickedSource.name;
@@ -204,7 +212,5 @@ export class CustomService {
     }
     return this.http.delete(this.rootURL+"/Customs/" + name);
   }
-
-
 
 }
