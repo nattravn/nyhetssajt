@@ -68,9 +68,4 @@ export class NewsListService {
     })
   }
 
-  filterList(source:string){
-    this.globalList = this.globalList.filter(item => 
-      item.source.toLocaleLowerCase().indexOf(source.toLocaleLowerCase()) != -1);
-    //this.searchTerm = source.toString();
-  }
 }

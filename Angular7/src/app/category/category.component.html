@@ -1,5 +1,5 @@
 <h2>{{categoryService.categoryList[0].category}}</h2>
-<div *ngFor="let feed of categoryService.categoryList | orderBy: order : true">
+<div *ngFor="let feed of categoryService.categoryList | orderBy: date : true | newsFilter:newsListService.searchTerm">
   <div class="col-md-10 blogShort">
       <h1>{{feed.title}}</h1>
       <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->

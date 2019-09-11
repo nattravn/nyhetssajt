@@ -1,6 +1,6 @@
 <h2>{{svdService.sourceName}}</h2>
 <p>{{svdService.sourceInfo}}</p>
-<div *ngFor="let feed of svdService.sortedList | orderBy: order : true">
+<div *ngFor="let feed of svdService.sortedList | orderBy: date : true | newsFilter:newsListService.searchTerm">
     <div class="col-md-10 blogShort">
         <h1>{{feed.title}}</h1>
         <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->

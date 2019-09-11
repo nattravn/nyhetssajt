@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NtService } from '../shared/nt.service';
 import { CategoryService } from '../shared/category.service';
+import { NewsListService } from '../shared/news-list.service';
 
 @Component({
   selector: 'app-nt',
@@ -9,8 +10,8 @@ import { CategoryService } from '../shared/category.service';
 })
 export class NtComponent implements OnInit {
 
-  order: string = 'pubDate';
-  constructor(private ntService : NtService, private categoryService : CategoryService) { }
+  date: string = 'pubDate';
+  constructor(private ntService : NtService, private categoryService : CategoryService, private newsListService: NewsListService) { }
 
   ngOnInit() {
   }

@@ -48,10 +48,12 @@ export class CategoryService {
   populate(category: string){
     console.log("this.list: ", this.list);
     this.categoryList = new Array<Expressen>();
-    this.list.forEach(item =>{
-      if(item.category == category){
-        this.categoryList.push(item);
-      }
-    })
+
+    this.categoryList = this.list.filter(item => item.category == category);
+    // this.list.forEach(item =>{
+    //   if(item.category == category){
+    //     this.categoryList.push(item);
+    //   }
+    // })
   }
 }

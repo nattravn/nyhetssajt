@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CustomService } from '../shared/custom.service';
 import { CategoryService } from '../shared/category.service';
 import { Router } from '@angular/router';
+import { NewsListService } from '../shared/news-list.service';
 
 @Component({
   selector: 'app-custom',
@@ -11,8 +12,9 @@ import { Router } from '@angular/router';
 export class CustomComponent implements OnInit {
 
   order: string = 'pubDate';
-  constructor(private router: Router  ,private customService: CustomService, private categoryService : CategoryService) {
+  constructor(private router: Router  ,private customService: CustomService, private categoryService : CategoryService, private newsListService: NewsListService) {
   }
+  searchTerm:string;
 
   isLoaded: boolean = false;
 

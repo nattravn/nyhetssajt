@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ExpressenService } from 'src/app/shared/expressen.service';
 import { CategoryService } from '../shared/category.service';
+import { NewsListService } from '../shared/news-list.service';
 
 @Component({
   selector: 'app-expressen',
@@ -9,8 +10,11 @@ import { CategoryService } from '../shared/category.service';
 })
 export class ExpressenComponent implements OnInit {
 
-  order: string = 'pubDate';
-  constructor(private expressenService: ExpressenService, private categoryService : CategoryService) { }
+  date: string = 'pubDate';
+  constructor(
+    private expressenService: ExpressenService, 
+    private categoryService : CategoryService, 
+    private newsListService: NewsListService) { }
 
   ngOnInit() {
   }

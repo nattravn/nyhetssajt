@@ -1,6 +1,6 @@
 <h2>{{customService.activeSourceName}}</h2>
 <p>{{customService.activeSourceInfo }} </p>
-<div *ngFor="let feed of customService.activeList | orderBy: order : true">
+<div *ngFor="let feed of customService.activeList | orderBy: order : true | newsFilter:newsListService.searchTerm">
     <div class="col-md-10 blogShort">
         <h1>{{feed.title}}</h1>
         <!-- <img [src]="feed.ImageURL" alt="post img" class="pull-left img-responsive thumb margin10 img-thumbnail"> -->

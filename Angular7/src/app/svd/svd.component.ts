@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { SvdService } from '../shared/svd.service';
 import { CategoryService } from '../shared/category.service';
+import { NewsListService } from '../shared/news-list.service';
 
 @Component({
   selector: 'app-svd',
@@ -8,8 +9,8 @@ import { CategoryService } from '../shared/category.service';
 })
 export class SvdComponent implements OnInit {
 
-  order: string = 'pubDate';
-  constructor(private svdService : SvdService, private categoryService : CategoryService) { }
+  date: string = 'pubDate';
+  constructor(private svdService : SvdService, private categoryService : CategoryService, private newsListService: NewsListService) { }
 
   ngOnInit() {
   }
