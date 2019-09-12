@@ -1,5 +1,5 @@
 import { PipeTransform, Pipe } from '@angular/core';
-import { Expressen } from '../shared/expressen.model';
+import { Expressen } from './shared/expressen.model';
 
 @Pipe({
     name: "newsFilter"

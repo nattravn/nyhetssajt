@@ -98,7 +98,6 @@ namespace Nyhetssajt.Controllers
         [HttpDelete("{name}")]
         public int DeleteCustom(string name)
         {
-
             var deletedRecords = new List<Custom>();
 
             int count = 0;
@@ -106,38 +105,6 @@ namespace Nyhetssajt.Controllers
             count =_context.Customs.Where(b => b.source.ToLower() == name.ToLower()).ToList().Count();
             _context.Customs.RemoveRange(_context.Customs.Where(b => b.source.ToLower() == name.ToLower()));
             _context.SaveChanges();
-
-
-            //List<Custom> l = _context.Customs.ToList();
-
-            //int n = _context.Customs.Count();
-
-            //var itemsToDelete = _context.Set<Custom>();
-            //_context.Customs.RemoveRange(itemsToDelete);
-            //_context.SaveChanges();
-
-            //_context.Database.ExecuteSqlCommand("DELETE FROM Customs DBCC CHECKIDENT('Customs', RESEED,  0 )");
-
-            //n = _context.Customs.Count();
-            //Debug.WriteLine("n after: " + n);
-            //Debug.WriteLine("List count: " + l.Count());
-
-            //l.ForEach(item =>
-            //{
-            //    Custom c = new Custom();
-            //    c.ImageURL = item.ImageURL;
-            //    c.Info = item.Info;
-            //    c.Link = item.Link;
-            //    c.Rss = item.Rss;
-            //    c.Source = item.Source;
-            //    c.Text = item.Text;
-            //    c.Title = item.Title;
-            //    c.Date = item.Date;
-            //    c.Category = item.Category;
-
-            //    _context.Customs.Add(c);
-            //});
-
 
             return count;
         }

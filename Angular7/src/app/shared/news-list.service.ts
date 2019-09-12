@@ -15,9 +15,8 @@ import { Subject } from 'rxjs';
 })
 export class NewsListService {
 
-  public globalList: Expressen[]= new Array<Expressen>();
+  public globalList: Expressen[]= [];
   searchTerm:string;
-
   isLoaded: boolean = false;
 
   loadingVisibilityChange: Subject<boolean> = new Subject<boolean>();
@@ -27,11 +26,13 @@ export class NewsListService {
               private svdService: SvdService,
               private customService: CustomService,
               private categoryService: CategoryService) { 
+    console.log("newsListConstructor");
     this.initList();
   }
 
 
   initList(){
+    this.globalList = []
     this.expressenService.getExpressen().then((expressenItem: Expressen[]) =>{
       this.svdService.getSvd().then((svdItem: Svd[]) =>{
         this.ntService.getNt().then((ntItem: Nt[]) =>{

@@ -121,7 +121,7 @@ export class CustomService {
     /* otherwise updateActiveSource will execute before anything has been pushed to this.sources and this.customRoutes */
     await this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+clickedSource.rss).toPromise().then(rss  =>{
       // empty the this array before we download more news from next source
-      let unsortedDownloads = [];
+      let downloadedFeeds = [];
 
       rss.items.forEach( rssItem => {
         let feed = new Custom();
@@ -146,7 +146,7 @@ export class CustomService {
         feed.rss = clickedSource.rss;
         feed.info = clickedSource.info;
 
-        unsortedDownloads.push(feed);
+        downloadedFeeds.push(feed);
         
       });
 
@@ -155,30 +155,33 @@ export class CustomService {
 
       // get news from database and compare it with the downloaded news
       this.getCustomSource(clickedSource.name).then((rows: Custom[]) => {
-        let sortedRows = rows.sort((a,b) => a.pubDate.localeCompare(b.pubDate));
-        let sortedDownloads = unsortedDownloads.sort((a,b) => a.pubDate.localeCompare(b.pubDate)); 
-        
-        this.activeList = sortedDownloads;
+        rows.sort((a,b) => a.pubDate.localeCompare(b.pubDate));
+        this.activeList = downloadedFeeds.sort((a,b) => a.pubDate.localeCompare(b.pubDate)); 
         
         // we only want to compare the 10 last rows
-        if(sortedRows.length > 10){
-          sortedRows = sortedRows.slice(sortedRows.length-10,sortedRows.length);
+        if(rows.length > 10){
+          rows = rows.slice(rows.length-10,rows.length);
         }
-
-        sortedDownloads.forEach(async (dowloadedFeed, index) =>{
-          /* post only if the downloaded feed is newer than the feed in the table
-          /* if bouth dates are equal the the '>' state will be true, thats why we need '!=' */
-          if( dowloadedFeed.pubDate > sortedRows[index].pubDate && 
-            dowloadedFeed.pubDate != sortedRows[index].pubDate){
-            console.log(dowloadedFeed.pubDate ," > ", sortedDownloads[index].pubDate);
-            this.postCustom(dowloadedFeed).subscribe((res : Custom) => {
-              console.log("feed inserted ", res.pubDate);
-            },
-            err =>{
-              console.log("Error: ", err);
-              debugger;
-            })
+        console.log("sortedRows: ", rows);
+        console.log("sortedDownloads: ", downloadedFeeds);
+        downloadedFeeds.forEach((dowloadedFeed, index) =>{
+          /* All downlowded rss feeds might not be updated when we reload the page, just a few can be updated
+          /* We must check if the newly downloaded feed does not already exist in the 10 last rows
+          /* post only if the downloaded feed is newer than the feed in the table and
+          /* it does not already exist in the 10 last rows */
+          if((!rows.some(e => e.title === dowloadedFeed.title))){
+            if( dowloadedFeed.pubDate > rows[index].pubDate){
+              console.log(dowloadedFeed.pubDate ," > ", rows[index].pubDate);
+              this.postCustom(dowloadedFeed).subscribe((res : Custom) => {
+                console.log("feed inserted ", res.pubDate);
+              },
+              err =>{
+                console.log("Error: ", err);
+                debugger;
+              })
+            }
           }
+          
         })
       })
     });

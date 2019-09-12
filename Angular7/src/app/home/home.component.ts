@@ -24,23 +24,17 @@ export class HomeComponent implements OnInit {
 
   isLoaded: boolean = false;
 
-  loadingVisibilityChange: Subject<boolean> = new Subject<boolean>();
+  constructor(private newsListService: NewsListService ){ 
+    console.log("home constructor"); 
+  }
 
-  constructor(private expressenService: ExpressenService, 
-              private ntService: NtService, 
-              private svdService: SvdService,
-              private customService: CustomService,
-              private categoryService: CategoryService,
-              private newsListService: NewsListService ){ 
+  ngOnInit() {
+    this.newsListService.initList();
 
     this.newsListService.loadingVisibilityChange.subscribe((value) =>{
       console.log("value: ", value);
       this.isLoaded = value;
     })
-  }
-
-  ngOnInit() {
-
   }
 
 }

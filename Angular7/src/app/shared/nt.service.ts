@@ -49,7 +49,7 @@ export class NtService {
 
         // we only want to compare the 10 last rows
         if(rows.length > 10){
-          rows = rows.slice(rows.length-10,rows.length);
+          rows.slice(rows.length-10,rows.length);
         }
 
         /* records are inserted "randomly" in the tabel and also returnd randomly, 
@@ -58,16 +58,17 @@ export class NtService {
 
         this.sortedList.forEach(async (dowloadedFeed, index) =>{
           // post only if the downloaded feed is newer than the feed in the table
-          if(dowloadedFeed.pubDate > rows[index].pubDate &&
-            dowloadedFeed.pubDate != rows[index].pubDate){
+          if((!rows.some(e => e.title === dowloadedFeed.title))){
+            if(dowloadedFeed.pubDate > rows[index].pubDate){
 
-            this.postNt(this.sortedList[index]).subscribe((res : Nt) => {
-              console.log("Expressen feed inserted ", res.pubDate);
-            },
-            err =>{
-              console.log("Error: ", err);
-              debugger;
-            })
+              this.postNt(this.sortedList[index]).subscribe((res : Nt) => {
+                console.log("Expressen feed inserted ", res.pubDate);
+              },
+              err =>{
+                console.log("Error: ", err);
+                debugger;
+              })
+            }
           }
         })
       })
