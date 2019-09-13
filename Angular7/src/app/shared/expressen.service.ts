@@ -6,6 +6,7 @@ import { FileSaverService } from 'ngx-filesaver';
 import { Observable, bindNodeCallback } from 'rxjs';
 import { map, tap, startWith } from 'rxjs/operators';
 import { async } from 'q';
+import * as globals from '../globals';
 // import { parseString, parseFile, parseURL, RSSParsed } from 'rss-parser';
 
 
@@ -17,7 +18,7 @@ const CACHE_KEY = "httpRssCache";
 })
 
 export class ExpressenService {
-  readonly rootURL = "http://localhost:44380/api";
+  readonly rootURL = globals.localhostURL;
   cacheList: Expressen[] = [];
   unsortedList: Expressen[] = [];
   sortedList: Expressen[]  = [];
@@ -66,11 +67,15 @@ export class ExpressenService {
           rows.slice(rows.length-10,rows.length);
         }
 
+        if(rows.length == 0){
+          rows = this.assignEmptyValuse();
+        }
+
         /* records are inserted "randomly" in the tabel and also returnd randomly, 
         /* we must sort it to get the earliest date first in the list */
         rows.sort((a,b) => a.pubDate.localeCompare(b.pubDate));
 
-        this.sortedList.forEach(async (dowloadedFeed, index) =>{
+        this.sortedList.forEach((dowloadedFeed, index) =>{
           // post only if the downloaded feed is newer than the feed in the table
           if((!rows.some(e => e.title === dowloadedFeed.title))){
             if( dowloadedFeed.pubDate > rows[index].pubDate){
@@ -105,6 +110,23 @@ export class ExpressenService {
 
   putExpressen(feed : Expressen){
     return this.http.put(this.rootURL+"/Expressens/"+feed.id, feed);
+  }
+
+  assignEmptyValuse(): Expressen[]{
+    let rows: Expressen[] = [];
+    for (let index = 0; index < 10; index++) {
+      let row = new Expressen();
+      row.ImageURL = "";
+      row.category = "";
+      row.description = "";
+      row.id = 0;
+      row.link = "";
+      row.pubDate = "";
+      row.source = "";
+      row.title = "";
+      rows.push(row);
+    }
+    return rows;
   }
   
 }

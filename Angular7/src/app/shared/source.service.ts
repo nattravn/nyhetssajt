@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Source } from './source.model';
+import * as globals from '../globals';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SourceService {
-  readonly rootURL = "http://localhost:44380/api";
+  readonly rootURL = globals.localhostURL;
   constructor(private http: HttpClient) { }
 
   getSource(sourceName : string){

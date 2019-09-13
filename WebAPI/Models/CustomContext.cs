@@ -15,5 +15,13 @@ namespace Nyhetssajt.Models
         }
 
         public DbSet<Custom> Customs { get; set; }
+
+        public DbSet<Expressen> Expressens { get; set; }
+
+        public DbSet<Nt> Nts { get; set; }
+
+        public DbSet<Source> Sources { get; set; }
+
+        public DbSet<Svd> Svds { get; set; }
     }
 }

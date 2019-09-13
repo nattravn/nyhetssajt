@@ -2,13 +2,15 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Svd } from './svd.model';
 import { async } from '@angular/core/testing';
+import * as globals from '../globals';
+
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class SvdService {
-  readonly rootURL = "http://localhost:44380/api";
+  readonly rootURL = globals.localhostURL;
   readonly rssUrl: string = "https://www.svd.se/?service=rss";
 
   sortedList: Svd[] = []
@@ -50,6 +52,10 @@ export class SvdService {
           rows.slice(rows.length-10,rows.length);
         }
 
+        if(rows.length == 0){
+          rows = this.assignEmptyValuse();
+        }
+
         /* records are inserted "randomly" in the tabel and also returnd randomly, 
         /* we must sort it to get the earliest date first in the list */
         rows.sort((a,b) => a.pubDate.localeCompare(b.pubDate));
@@ -83,5 +89,22 @@ export class SvdService {
 
   putSvd(feed : Svd){
     return this.http.put(this.rootURL+"/Svds/"+feed.id, feed);
+  }
+
+  assignEmptyValuse(): Svd[]{
+    let rows: Svd[] = [];
+    for (let index = 0; index < 10; index++) {
+      let row = new Svd();
+      row.ImageURL = "";
+      row.category = "";
+      row.description = "";
+      row.id = 0;
+      row.link = "";
+      row.pubDate = "";
+      row.source = "";
+      row.title = "";
+      rows.push(row);
+    }
+    return rows;
   }
 }

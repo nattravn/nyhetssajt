@@ -8,6 +8,7 @@ import { Source } from './source.model';
 import { Subject } from 'rxjs';
 import { skip } from 'rxjs/operators';
 import { SourceService } from './source.service';
+import * as globals from '../globals';
 
 @Injectable({
   providedIn: 'root'
@@ -30,7 +31,7 @@ export class CustomService {
     Rss: new FormControl("")
   })
   
-  readonly rootURL = "http://localhost:44380/api";
+  readonly rootURL = globals.localhostURL;
   constructor(
     private http: HttpClient, 
     private route: ActivatedRoute, 
@@ -39,6 +40,7 @@ export class CustomService {
     /* we dont want to run this funtion twice */
     this.route.queryParams.pipe(skip(1)).subscribe(params => {
       if(params.sourceParam){
+        console.log("set custom");
         this.sourceService.getSource(params.sourceParam).then((clickedSource: Source) =>{
           this.setCustoms(clickedSource);
         });
@@ -162,6 +164,7 @@ export class CustomService {
         if(rows.length > 10){
           rows = rows.slice(rows.length-10,rows.length);
         }
+
         console.log("sortedRows: ", rows);
         console.log("sortedDownloads: ", downloadedFeeds);
         downloadedFeeds.forEach((dowloadedFeed, index) =>{

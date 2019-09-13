@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Nt } from './nt.model';
+import * as globals from '../globals';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NtService {
 
-  readonly rootURL = "http://localhost:44380/api";
+  readonly rootURL = globals.localhostURL;
   readonly rssUrl: string = "http://www.nt.se/nyheter/norrkoping/rss/";
 
   list: Nt[] = []
@@ -23,11 +24,11 @@ export class NtService {
        We push each item to an unsorted list and then sort it and assign it to the "view" list */
     
     this.unsortedList = [];
-    this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(res  =>{
+    this.http.get<any>(" https://api.rss2json.com/v1/api.json?rss_url="+this.rssUrl).toPromise().then(async res  =>{
       this.sourceInfo = res.feed.description;
       this.sourceName = res.feed.title;
       
-      res.items.forEach(item=> {
+      await res.items.forEach(item=> {
         this.feed = new Nt();
         this.feed.category =  item.categories.length > 0 ? item.categories[0] : null ;
         this.feed.pubDate = item.pubDate;
@@ -51,12 +52,15 @@ export class NtService {
         if(rows.length > 10){
           rows.slice(rows.length-10,rows.length);
         }
+        if(rows.length == 0){
+          rows = this.assignEmptyValuse();
+        }
 
         /* records are inserted "randomly" in the tabel and also returnd randomly, 
         /* we must sort it to get the earliest date first in the list */
         rows.sort((a,b) => a.pubDate.localeCompare(b.pubDate));
 
-        this.sortedList.forEach(async (dowloadedFeed, index) =>{
+        this.sortedList.forEach((dowloadedFeed, index) =>{
           // post only if the downloaded feed is newer than the feed in the table
           if((!rows.some(e => e.title === dowloadedFeed.title))){
             if(dowloadedFeed.pubDate > rows[index].pubDate){
@@ -85,5 +89,22 @@ export class NtService {
 
   putNt(feed : Nt){
     return this.http.put(this.rootURL+"/Nts/"+feed.id, feed);
+  }
+
+  assignEmptyValuse(): Nt[]{
+    let rows: Nt[] = [];
+    for (let index = 0; index < 10; index++) {
+      let row = new Nt();
+      row.ImageURL = "";
+      row.category = "";
+      row.description = "";
+      row.id = 0;
+      row.link = "";
+      row.pubDate = "";
+      row.source = "";
+      row.title = "";
+      rows.push(row);
+    }
+    return rows;
   }
 }

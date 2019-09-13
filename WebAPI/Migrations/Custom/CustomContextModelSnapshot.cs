@@ -52,6 +52,112 @@ namespace Nyhetssajt.Migrations.Custom
 
                     b.ToTable("Customs");
                 });
+
+            modelBuilder.Entity("Nyhetssajt.Models.Expressen", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ImageURL");
+
+                    b.Property<string>("category")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("description");
+
+                    b.Property<string>("link")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("pubDate")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("source")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("title");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Expressens");
+                });
+
+            modelBuilder.Entity("Nyhetssajt.Models.Nt", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ImageURL");
+
+                    b.Property<string>("category")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("description");
+
+                    b.Property<string>("link")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("pubDate")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("source")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("title");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Nts");
+                });
+
+            modelBuilder.Entity("Nyhetssajt.Models.Source", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("info");
+
+                    b.Property<string>("name");
+
+                    b.Property<string>("rss");
+
+                    b.Property<string>("title");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Sources");
+                });
+
+            modelBuilder.Entity("Nyhetssajt.Models.Svd", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ImageURL");
+
+                    b.Property<string>("category")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("description");
+
+                    b.Property<string>("link")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("pubDate")
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("source")
+                        .HasColumnType("nvarchar(250)");
+
+                    b.Property<string>("title");
+
+                    b.HasKey("id");
+
+                    b.ToTable("Svds");
+                });
 #pragma warning restore 612, 618
         }
     }
