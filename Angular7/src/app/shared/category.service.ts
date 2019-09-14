@@ -23,7 +23,7 @@ export class CategoryService {
       this.svdService.getSvd().then((svdItem: Expressen[]) =>{
         this.ntService.getNt().then((ntItem: Expressen[]) =>{
           this.customService.getCustom().then((customItem: Custom[]) =>{
-
+            console.log("getCustom category: ", customItem);
             ntItem.forEach(item =>{ 
               this.list.push(item)
             })

@@ -37,6 +37,7 @@ export class NewsListService {
       this.svdService.getSvd().then((svdItem: Svd[]) =>{
         this.ntService.getNt().then((ntItem: Nt[]) =>{
           this.customService.getCustom().then((customItem: Custom[]) =>{
+            console.log("getCustom news-list: ", customItem);
             ntItem.forEach(item =>{
               console.log("item.Source: ", item.source);
               item.source="Norrköpings Tidning";

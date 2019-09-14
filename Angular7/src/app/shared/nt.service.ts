@@ -8,7 +8,7 @@ import * as globals from '../globals';
 })
 export class NtService {
 
-  readonly rootURL = globals.localhostURL;
+  readonly rootURL = globals.backEndURL;
   readonly rssUrl: string = "http://www.nt.se/nyheter/norrkoping/rss/";
 
   list: Nt[] = []

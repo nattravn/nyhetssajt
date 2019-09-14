@@ -10,7 +10,7 @@ import * as globals from '../globals';
   providedIn: 'root'
 })
 export class SvdService {
-  readonly rootURL = globals.localhostURL;
+  readonly rootURL = globals.backEndURL;
   readonly rssUrl: string = "https://www.svd.se/?service=rss";
 
   sortedList: Svd[] = []

@@ -29,7 +29,7 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.newsListService.initList();
+    //this.newsListService.initList();
 
     this.newsListService.loadingVisibilityChange.subscribe((value) =>{
       console.log("value: ", value);

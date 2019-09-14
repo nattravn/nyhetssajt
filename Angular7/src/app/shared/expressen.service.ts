@@ -18,7 +18,7 @@ const CACHE_KEY = "httpRssCache";
 })
 
 export class ExpressenService {
-  readonly rootURL = globals.localhostURL;
+  readonly rootURL = globals.backEndURL;
   cacheList: Expressen[] = [];
   unsortedList: Expressen[] = [];
   sortedList: Expressen[]  = [];

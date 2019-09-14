@@ -31,7 +31,7 @@ export class CustomService {
     Rss: new FormControl("")
   })
   
-  readonly rootURL = globals.localhostURL;
+  readonly rootURL = globals.backEndURL;
   constructor(
     private http: HttpClient, 
     private route: ActivatedRoute, 

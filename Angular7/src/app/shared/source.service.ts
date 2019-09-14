@@ -7,7 +7,7 @@ import * as globals from '../globals';
   providedIn: 'root'
 })
 export class SourceService {
-  readonly rootURL = globals.localhostURL;
+  readonly rootURL = globals.backEndURL;
   constructor(private http: HttpClient) { }
 
   getSource(sourceName : string){
