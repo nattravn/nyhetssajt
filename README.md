@@ -15,7 +15,17 @@ created in C# .Net Core 2.2
 
 3. Select `.Net Core2.2` as target framework in your soultion properties (install .Net Core2.2 if it's not available)
 
-4. Open launchSettings.json copy the applicationUrl adress under iisExpress and replace it `angular7/globals.ts`.
+4. Open `launchSettings.json` copy the `applicationUrl` adress and replace the current `backEndURL` in `angular7/globals.ts`.
+
+ ```"iisSettings": {
+    "windowsAuthentication": false, 
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:44380",
+      "sslPort": 0
+    }
+  }
+  ```
 
 5. In Nuget Package Manager run:
  - `Install-Package NuGet.Frameworks -Version 5.2.0`
