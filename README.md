@@ -34,7 +34,7 @@ created in C# .Net Core 2.2
 
 6. Hit F5 to start the solution
 
-7. Navigate to the Angular7 folder with in Visual Studio Code terminal and run:
+7. Navigate to the Angular7 folder in your terminal and run:
 `npm install`
 
 8. Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
