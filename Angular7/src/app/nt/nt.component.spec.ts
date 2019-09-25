@@ -1,6 +1,11 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { NtComponent } from './nt.component';
+import { OrderModule } from 'ngx-order-pipe';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { Svd } from '../shared/svd.model';
+import { NewsFilterPipe } from '../news-filter.pipe';
 
 describe('NtComponent', () => {
   let component: NtComponent;
@@ -8,7 +13,9 @@ describe('NtComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ NtComponent ]
+      imports: [OrderModule, HttpClientModule, RouterModule.forRoot([])],
+      providers: [Svd],
+      declarations: [ NtComponent,NewsFilterPipe ]
     })
     .compileComponents();
   }));

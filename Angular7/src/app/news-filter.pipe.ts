@@ -7,6 +7,7 @@ import { Expressen } from './shared/expressen.model';
 export class NewsFilterPipe implements PipeTransform{
     transform(news: Expressen[],  searchTerm:string): Expressen[]{
         if(!news || !searchTerm){
+            console.log("searchTerm: ", searchTerm);
             return news;
         }
 

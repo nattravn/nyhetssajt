@@ -13,9 +13,7 @@ import { NewsListService } from '../shared/news-list.service';
 export class CategoryComponent implements OnInit {
   public list: Expressen[];
   date: string = 'pubDate';
-  constructor(private expressenService: ExpressenService, 
-              private ntService: NtService, 
-              private svdService: SvdService,
+  constructor(
               private categoryService: CategoryService,
               private newsListService: NewsListService) { }
 

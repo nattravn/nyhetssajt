@@ -11,19 +11,20 @@ import { NewsListService } from '../shared/news-list.service';
 })
 export class CustomComponent implements OnInit {
 
-  order: string = 'pubDate';
-  constructor(private router: Router  ,private customService: CustomService, private categoryService : CategoryService, private newsListService: NewsListService) {
-  }
-  searchTerm:string;
+  order = 'pubDate';
+  constructor(private router: Router,
+    private customService: CustomService,
+    private categoryService: CategoryService,
+    private newsListService: NewsListService) {}
+  searchTerm: string;
 
-  isLoaded: boolean = false;
+  isLoaded = false;
 
   ngOnInit() {
     // updating isLoaded value to remove the loading text i the view
-    this.customService.loadingVisibilityChange.subscribe(value =>{
+    this.customService.loadingVisibilityChange.subscribe(value => {
       this.isLoaded = value;
-    })
-    
+    });
   }
 
 

@@ -63,7 +63,10 @@ export class NewsListService {
             console.log("this.list: ", this.globalList.length);
 
             this.globalList.sort((a,b) => b.pubDate.localeCompare(a.pubDate));
+
             this.globalList = this.globalList.slice(0,10);
+            
+            
           })
         })
       })

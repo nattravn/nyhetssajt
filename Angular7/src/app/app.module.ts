@@ -27,7 +27,9 @@ import { OrderModule } from 'ngx-order-pipe';
 import { NewsFilterPipe } from './news-filter.pipe';
 
 
+
 @NgModule({
+  
   declarations: [
     AppComponent,
     ExpressenComponent,
@@ -49,8 +51,8 @@ import { NewsFilterPipe } from './news-filter.pipe';
     ReactiveFormsModule,
     FileSaverModule,
     OrderModule
-    
   ],
+
   providers: [
     ExpressenService,
     Expressen,
@@ -61,7 +63,8 @@ import { NewsFilterPipe } from './news-filter.pipe';
     CustomService,
     Custom
   ],
+
   bootstrap: [AppComponent],
-  entryComponents: [CustomComponent]
+  //entryComponents: [CustomComponent]
 })
 export class AppModule { }

@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { CustomService } from './shared/custom.service';
 import { CustomComponent } from './custom/custom.component';
 import { Custom } from './shared/custom.model';
-import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { NewsListService } from './shared/news-list.service';
 import { SourceService } from './shared/source.service';
@@ -26,7 +25,6 @@ export class AppComponent {
     private feed: Custom, 
     private sourceService: SourceService,
     private customService: CustomService,  
-    private http :  HttpClient, 
     private newsListService: NewsListService
     ) { 
 

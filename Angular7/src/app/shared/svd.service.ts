@@ -4,7 +4,7 @@ import { Svd } from './svd.model';
 import { async } from '@angular/core/testing';
 import * as globals from '../globals';
 
-
+const FEED_SIZE: number = 10;
 
 @Injectable({
   providedIn: 'root'
@@ -41,15 +41,14 @@ export class SvdService {
         this.unsortedList.push(this.feed);
 
       });
-      this.unsortedList.sort((a,b) => a.pubDate.localeCompare(b.pubDate)); 
-      this.sortedList = this.unsortedList;
-
+      this.sortedList = this.unsortedList.sort((a,b) => a.pubDate.localeCompare(b.pubDate)); 
+      
       this.getSvd().then(table =>{
         let rows = table as Svd[];
 
         // we only want to compare the 10 last rows
-        if(rows.length > 10){
-          rows.slice(rows.length-10,rows.length);
+        if(rows.length > FEED_SIZE){
+          rows.slice(rows.length-FEED_SIZE,rows.length);
         }
 
         if(rows.length == 0){
@@ -66,7 +65,7 @@ export class SvdService {
             if(dowloadedFeed.pubDate > rows[index].pubDate){
 
               this.postSvd(this.sortedList[index]).subscribe((res : Svd) => {
-                console.log("Expressen feed inserted ", res.pubDate);
+                console.log("Svd feed inserted ", res.pubDate);
               },
               err =>{
                 console.log("Error: ", err);
@@ -93,7 +92,7 @@ export class SvdService {
 
   assignEmptyValuse(): Svd[]{
     let rows: Svd[] = [];
-    for (let index = 0; index < 10; index++) {
+    for (let index = 0; index < FEED_SIZE; index++) {
       let row = new Svd();
       row.ImageURL = "";
       row.category = "";
